@@ -21,16 +21,10 @@ class LabelRenderer {
         // 清空容器
         this.container.innerHTML = '';
         
-        // 默认标签设置
-        let labelSettings = {
-            width: 200,
-            height: 100
-        };
-        
-        // 创建标签容器
+        // 创建标签容器，宽度和高度设为100%以适应父容器
         const labelContainer = document.createElement('div');
-        labelContainer.style.width = `${labelSettings.width}px`;
-        labelContainer.style.height = `${labelSettings.height}px`;
+        labelContainer.style.width = '100%';
+        labelContainer.style.height = '100%';
         labelContainer.style.position = 'relative';
         labelContainer.style.border = '1px solid #ccc';
         

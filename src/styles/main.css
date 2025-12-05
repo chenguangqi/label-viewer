@@ -146,34 +146,19 @@ header h1::after {
 
 
 /* 标签预览区域样式 */
-.preview-section {
+#label-preview {
     display: flex;
     flex-direction: column;
-    gap: 15px;
     background: white;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     transition: box-shadow 0.3s ease;
     min-width: 0;
-    height: 500px; /* 固定高度以充分利用空间 */
-    width: 100%; /* 确保填满父容器宽度 */
+    height: 100%;
+    width: 100%;
     box-sizing: border-box;
-}
 
-.preview-section:hover {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-}
-
-.preview-section h2 {
-    margin-top: 0;
-    color: #2c3e50;
-    font-weight: 600;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #eee;
-}
-
-#label-preview {
     flex: 1;
     border: 2px dashed #bdc3c7;
     padding: 20px;
@@ -184,9 +169,11 @@ header h1::after {
     transition: border-color 0.3s ease;
     box-sizing: border-box;
     min-height: 0;
+    height: 500px; /* 固定高度以充分利用空间 */
 }
 
 #label-preview:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
     border-color: #3498db;
 }
 
