@@ -31,6 +31,9 @@ class LabelDesigner {
         
         // 绑定事件
         this.bindEvents();
+        
+        // 初始化工具箱拖拽事件
+        this.initToolboxDrag();
     }
     
     createElements() {
@@ -62,6 +65,17 @@ class LabelDesigner {
             position: 'relative',
             width: '100%',
             height: '100%'
+        });
+    }
+    
+    initToolboxDrag() {
+        // 为工具箱中的所有可拖拽项添加事件监听器
+        const toolboxItems = document.querySelectorAll('.designer-toolbox .toolbox-item[draggable="true"]');
+        toolboxItems.forEach(item => {
+            item.addEventListener('dragstart', (e) => {
+                const type = item.getAttribute('data-type');
+                e.dataTransfer.setData('text/plain', type);
+            });
         });
     }
     
