@@ -12,6 +12,7 @@ class VisualDesigner {
         this.elements = [];
         this.isDragging = false;
         this.dragOffset = { x: 0, y: 0 };
+        this.label = new Label(); // 使用Label类管理指令
         
         this.init();
     }
@@ -174,6 +175,14 @@ class VisualDesigner {
         
         // 创建元素
         const elementData = this.createElement(type, params);
+        
+        // 添加到Label实例中
+        const instruction = {
+            type: type,
+            params: params
+        };
+        this.label.addInstruction(instruction);
+        
         return elementData;
     }
     
@@ -418,6 +427,7 @@ class VisualDesigner {
     clear() {
         this.canvas.innerHTML = '';
         this.elements = [];
+        this.label.clear();
         this.deselectElement();
     }
     
@@ -429,13 +439,17 @@ class VisualDesigner {
                 this.createElement(instruction.type, instruction.params);
             }
         }
+        
+        // 加载到Label实例中
+        this.label.loadFromInstructions(instructions);
     }
     
     getAllInstructions() {
-        return this.elements.map(elementData => ({
-            type: elementData.type,
-            params: elementData.params
-        }));
+        return this.label.getAllInstructions();
+    }
+    
+    getLabel() {
+        return this.label;
     }
 }
 

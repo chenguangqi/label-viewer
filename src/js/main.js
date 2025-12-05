@@ -25,6 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const helpData = window.HelpData || 
                      (typeof require !== 'undefined' ? require('./help-data.js') : null);
     
+    // 初始化Label实例
+    const label = new Label();
+    
     // 初始化可视化设计器
     let visualDesigner = null;
     let isSyncing = false; // 防止循环更新
@@ -82,7 +85,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-    
     
     // 绑定输入框光标位置变化事件
     instructionInput.addEventListener('keyup', () => {
