@@ -184,7 +184,7 @@ header h1::after {
 /* 帮助区域样式 */
 .help-section {
     background: white;
-    padding: 20px;
+    padding: 10px;
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     transition: box-shadow 0.3s ease;
@@ -242,7 +242,7 @@ header h1::after {
 }
 
 .help-section {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .help-section h4 {
