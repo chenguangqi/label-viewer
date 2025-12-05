@@ -32,6 +32,9 @@ class LabelRenderer {
         labelContainer.style.width = '100%';
         labelContainer.style.height = '100%';
         labelContainer.style.boxSizing = 'border-box';
+        // 确保预览区内容不可编辑
+        labelContainer.style.userSelect = 'none';
+        labelContainer.style.pointerEvents = 'none';
         
         this.container.appendChild(labelContainer);
         

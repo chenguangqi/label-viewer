@@ -73,6 +73,22 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener('click', () => {
             const tabId = button.getAttribute('data-tab');
             
+            // 检查是否正在切换到预览标签页，并且有未保存的更改
+            if (tabId === 'preview-tab') {
+                // 检查标签设计器或标签编辑器是否有未同步的更改
+                const hasUnsavedChanges = (labelDesigner && labelDesigner.hasUnsavedChanges()) || 
+                                        (labelEditor && labelEditor.hasUnsavedChanges());
+                
+                // 如果有未保存的更改，提示用户
+                if (hasUnsavedChanges) {
+                    const confirmed = window.confirm('检测到未保存的更改，切换到预览将丢失这些更改，是否继续？');
+                    if (!confirmed) {
+                        // 如果用户取消，则阻止切换，保持当前标签页
+                        return;
+                    }
+                }
+            }
+            
             // 更新活动标签按钮
             tabButtons.forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
@@ -124,6 +140,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (propertiesPanel) {
                     propertiesPanel.style.display = 'none';
                 }
+                
+                // 同步标签设计器到标签编辑器
+                syncDesignerToEditor();
             }
         });
     });

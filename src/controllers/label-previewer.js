@@ -16,6 +16,10 @@ class LabelPreviewer {
         // 获取预览渲染容器
         this.previewContainer = document.getElementById('label-preview');
         
+        // 确保预览区只能读取，不能修改或交互
+        this.previewContainer.style.userSelect = 'none';      // 禁止选中文本
+        this.previewContainer.style.pointerEvents = 'none';   // 禁用所有鼠标事件
+        
         // 初始化渲染器
         this.renderer = new LabelRenderer(this.previewContainer);
         
