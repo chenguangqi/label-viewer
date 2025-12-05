@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 获取DOM元素
     const propertiesPanel = document.getElementById('properties-panel');
     const propertiesContent = document.getElementById('properties-content');
+    const toolbox = document.getElementById('toolbox'); // 获取工具箱元素
     
     const helpData = window.HelpData || 
                      (typeof require !== 'undefined' ? require('../models/help-data.js') : null);
@@ -65,17 +66,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             
+            // 特殊处理预览标签
+            if (tabId === 'preview-tab') {
+                // 隐藏工具箱和属性面板
+                if (toolbox) {
+                    toolbox.style.display = 'none';
+                }
+                if (propertiesPanel) {
+                    propertiesPanel.style.display = 'none';
+                }
+                
+                // 触发预览渲染
+                if (previewer) {
+                    previewer.render();
+                }
+            }
+            
             // 特殊处理设计器标签
             if (tabId === 'designer-tab') {
-                // 显示属性面板
+                // 显示工具箱和属性面板
+                if (toolbox) {
+                    toolbox.style.display = 'block';
+                }
                 if (propertiesPanel) {
                     propertiesPanel.style.display = 'block';
                 }
                 
                 // 同步代码到设计器
                 syncEditorToDesigner();
-            } else {
-                // 隐藏属性面板
+            } 
+            
+            // 特殊处理代码编辑器标签
+            if (tabId === 'editor-tab') {
+                // 隐藏工具箱和属性面板
+                if (toolbox) {
+                    toolbox.style.display = 'none';
+                }
                 if (propertiesPanel) {
                     propertiesPanel.style.display = 'none';
                 }
@@ -83,12 +109,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     
-    // 创建代码编辑器实例
+    // 创建标签编辑器实例
     const editorContainer = document.getElementById('editor-tab');
-    let codeEditor = null;
+    let labelEditor = null;
     
     if (editorContainer) {
-        codeEditor = new LabelCodeEditor(editorContainer, sharedLabel, (defaultHelp, instruction) => {
+        labelEditor = new LabelEditor(editorContainer, sharedLabel, (defaultHelp, instruction) => {
             const helpContent = document.getElementById('current-instruction-help');
             if (defaultHelp) {
                 helpContent.innerHTML = defaultHelp;
@@ -107,14 +133,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             helpContent.innerHTML = helpData.generateHelpHTML(helpInfo);
-        });
-        
-        // 监听预览请求事件
-        editorContainer.addEventListener('previewRequest', () => {
-            const previewTabButton = document.querySelector('[data-tab="preview-tab"]');
-            if (previewTabButton) {
-                previewTabButton.click();
-            }
         });
     }
     
@@ -160,8 +178,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 sharedLabel.loadFromInstructions(instructions);
                 
                 // 更新代码编辑器内容
-                if (codeEditor) {
-                    codeEditor.syncFromLabel();
+                if (labelEditor) {
+                    labelEditor.syncFromLabel();
                 }
             }
         } catch (e) {
@@ -322,5 +340,4 @@ document.addEventListener('DOMContentLoaded', () => {
             previewTabButton.click();
         }
     }, 100);
-});
 });

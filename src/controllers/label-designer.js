@@ -20,6 +20,9 @@ class LabelDesigner {
     }
     
     init() {
+        // 清空容器
+        this.container.innerHTML = '';
+        
         // 创建设计器容器
         this.designerContainer = document.createElement('div');
         this.designerContainer.className = 'designer-container';
