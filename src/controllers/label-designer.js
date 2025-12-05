@@ -53,6 +53,14 @@ class LabelDesigner {
             item.addEventListener('dragstart', (e) => {
                 const type = item.getAttribute('data-type');
                 e.dataTransfer.setData('text/plain', type);
+                
+                // 防止拖动时选中文本
+                e.dataTransfer.effectAllowed = 'move';
+            });
+            
+            // 防止拖动时选中文本内容
+            item.addEventListener('selectstart', (e) => {
+                e.preventDefault();
             });
         });
     }

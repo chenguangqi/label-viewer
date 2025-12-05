@@ -95,6 +95,10 @@ class TextInstruction extends Instruction {
         element.style.alignItems = 'center';
         element.style.justifyContent = 'center';
         element.style.fontSize = `${parseFloat(this.params[4]) || 12}px`;
+        element.style.userSelect = 'none'; // 防止拖动时选中文本
+        element.style.webkitUserSelect = 'none'; // Safari兼容
+        element.style.mozUserSelect = 'none'; // Firefox兼容
+        element.style.msUserSelect = 'none'; // IE兼容
         element.textContent = this.params[9] || '文本';
         
         return {
@@ -204,6 +208,10 @@ class BarcodeInstruction extends Instruction {
         element.style.display = 'flex';
         element.style.alignItems = 'center';
         element.style.justifyContent = 'center';
+        element.style.userSelect = 'none'; // 防止拖动时选中文本
+        element.style.webkitUserSelect = 'none'; // Safari兼容
+        element.style.mozUserSelect = 'none'; // Firefox兼容
+        element.style.msUserSelect = 'none'; // IE兼容
         element.textContent = '[BARCODE]';
         element.style.fontSize = '10px';
         
@@ -294,6 +302,10 @@ class QRCodeInstruction extends Instruction {
         element.style.display = 'flex';
         element.style.alignItems = 'center';
         element.style.justifyContent = 'center';
+        element.style.userSelect = 'none'; // 防止拖动时选中文本
+        element.style.webkitUserSelect = 'none'; // Safari兼容
+        element.style.mozUserSelect = 'none'; // Firefox兼容
+        element.style.msUserSelect = 'none'; // IE兼容
         element.textContent = '[QR]';
         element.style.fontSize = '10px';
         
@@ -379,6 +391,10 @@ class ImageInstruction extends Instruction {
         element.style.display = 'flex';
         element.style.alignItems = 'center';
         element.style.justifyContent = 'center';
+        element.style.userSelect = 'none'; // 防止拖动时选中文本
+        element.style.webkitUserSelect = 'none'; // Safari兼容
+        element.style.mozUserSelect = 'none'; // Firefox兼容
+        element.style.msUserSelect = 'none'; // IE兼容
         element.textContent = '[IMG]';
         element.style.fontSize = '10px';
         
@@ -480,6 +496,10 @@ class LineInstruction extends Instruction {
         element.style.backgroundColor = this.params[5] || '#000';
         element.style.transformOrigin = 'left center';
         element.style.transform = `rotate(${angle}deg)`;
+        element.style.userSelect = 'none'; // 防止拖动时选中文本
+        element.style.webkitUserSelect = 'none'; // Safari兼容
+        element.style.mozUserSelect = 'none'; // Firefox兼容
+        element.style.msUserSelect = 'none'; // IE兼容
         
         return {
             element: element,
@@ -489,7 +509,8 @@ class LineInstruction extends Instruction {
             y1: y1,
             x2: x2,
             y2: y2,
-            stroke: parseFloat(this.params[4]) || 1
+            width: length,
+            height: parseFloat(this.params[4]) || 1
         };
     }
     
@@ -575,6 +596,10 @@ class RectangleInstruction extends Instruction {
         element.style.height = `${parseFloat(this.params[3]) || 50}px`;
         element.style.backgroundColor = this.params[5] || 'transparent';
         element.style.border = `${parseFloat(this.params[4]) || 1}px solid ${this.params[6] || '#000'}`;
+        element.style.userSelect = 'none'; // 防止拖动时选中文本
+        element.style.webkitUserSelect = 'none'; // Safari兼容
+        element.style.mozUserSelect = 'none'; // Firefox兼容
+        element.style.msUserSelect = 'none'; // IE兼容
         
         return {
             element: element,

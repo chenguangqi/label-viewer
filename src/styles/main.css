@@ -260,6 +260,10 @@ header h1::after {
     border: 1px solid #e9ecef;
     gap: 8px; /* 添加图标和文字之间的间距 */
     text-align: center; /* 文本居中 */
+    user-select: none; /* 防止拖动时选中文本 */
+    -webkit-user-select: none; /* Safari兼容 */
+    -moz-user-select: none; /* Firefox兼容 */
+    -ms-user-select: none; /* IE兼容 */
 }
 
 .designer-toolbox .toolbox-item:hover {
