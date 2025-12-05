@@ -139,6 +139,25 @@ const HelpData = {
     },
 
     /**
+     * HTML转义函数
+     * @param {string} text - 需要转义的文本
+     * @returns {string} 转义后的文本
+     */
+    escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        
+        return text.replace(/[&<>"']/g, function(m) {
+            return map[m];
+        });
+    },
+
+    /**
      * 生成指令帮助HTML
      * @param {Object} helpData - 指令帮助数据
      * @returns {string} HTML字符串
@@ -152,11 +171,11 @@ const HelpData = {
             <div class="help-item">
                 <h3>${helpData.name}</h3>
                 <div class="help-section">
-                    <h4>指令语法</h4>
-                    <p><code>${helpData.syntax}</code></p>
+                    <h4>语法</h4>
+                    <p><code>${this.escapeHtml(helpData.syntax)}</code></p>
                 </div>
                 <div class="help-section">
-                    <h4>指令描述</h4>
+                    <h4>描述</h4>
                     <p>${helpData.description}</p>
                 </div>
         `;
@@ -164,7 +183,7 @@ const HelpData = {
         // 参数表格
         html += `
                 <div class="help-section">
-                    <h4>指令参数</h4>
+                    <h4>参数</h4>
                     <table>
                         <thead>
                             <tr>
@@ -199,7 +218,7 @@ const HelpData = {
         // 备注
         html += `
                 <div class="help-section">
-                    <h4>指令备注</h4>
+                    <h4>备注</h4>
                     <p>${helpData.remark}</p>
                 </div>
         `;
