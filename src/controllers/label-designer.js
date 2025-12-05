@@ -174,6 +174,25 @@ class LabelDesigner {
         if (this.onUpdate) {
             this.onUpdate();
         }
+        
+        // 更新共享Label实例中的指令
+        if (this.selectedElement) {
+            const elementData = this.elements.find(el => el.element === this.selectedElement);
+            if (elementData) {
+                // 查找对应的指令并更新
+                const instructions = this.label.getAllInstructionsWithId();
+                const instructionToUpdate = instructions.find(inst => 
+                    inst.type === elementData.type && 
+                    JSON.stringify(inst.params) === JSON.stringify(elementData.originalParams));
+                
+                if (instructionToUpdate) {
+                    this.label.updateInstruction(instructionToUpdate.id, {
+                        type: elementData.type,
+                        params: elementData.params
+                    });
+                }
+            }
+        }
     }
     
     addElementFromToolbox(type, clientX, clientY) {
@@ -265,6 +284,9 @@ class LabelDesigner {
                 break;
         }
         
+        // 保存原始参数以便后续查找和更新
+        elementData.originalParams = [...params];
+        
         this.elements.push(elementData);
         this.canvas.appendChild(elementData.element);
         
@@ -352,6 +374,21 @@ class LabelDesigner {
                 }
                 
                 this.updateInstruction(elementData);
+                
+                // 同步更新到共享Label实例
+                const instructions = this.label.getAllInstructionsWithId();
+                const instructionToUpdate = instructions.find(inst => 
+                    inst.type === elementData.type && 
+                    JSON.stringify(inst.params) === JSON.stringify(elementData.originalParams));
+                
+                if (instructionToUpdate) {
+                    this.label.updateInstruction(instructionToUpdate.id, {
+                        type: elementData.type,
+                        params: elementData.params
+                    });
+                    // 更新原始参数记录
+                    elementData.originalParams = [...elementData.params];
+                }
             }
         }
     }
