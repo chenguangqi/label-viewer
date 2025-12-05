@@ -21,18 +21,28 @@ class LabelRenderer {
         // 清空容器
         this.container.innerHTML = '';
         
-        // 创建标签容器，宽度和高度设为100%以适应父容器
+        // 创建标签容器，模拟真实标签纸张效果
         const labelContainer = document.createElement('div');
+        labelContainer.className = 'label-preview-container';
+        labelContainer.style.position = 'relative';
+        labelContainer.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.1)';
+        labelContainer.style.backgroundColor = '#fff';
+        labelContainer.style.border = '1px solid #ddd';
+        labelContainer.style.display = 'block';
         labelContainer.style.width = '100%';
         labelContainer.style.height = '100%';
-        labelContainer.style.position = 'relative';
-        labelContainer.style.border = '1px solid #ccc';
+        labelContainer.style.boxSizing = 'border-box';
         
         this.container.appendChild(labelContainer);
         
         // 渲染各个元素
         for (const instruction of instructions) {
             try {
+                // 跳过标签设置指令，因为它只用于设置尺寸
+                if (instruction.type === 'label') {
+                    continue;
+                }
+                
                 // 创建指令类实例并渲染
                 const instructionInstance = InstructionParser.createInstructionInstance(instruction);
                 instructionInstance.render(labelContainer);
