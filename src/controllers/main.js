@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // 同步标志，防止循环更新
+    // 防止循环同步的标志位
     let isSyncing = false;
     
     // 绑定标签页切换事件
@@ -335,4 +335,42 @@ document.addEventListener('DOMContentLoaded', () => {
             previewTabButton.click();
         }
     }, 100);
+    
+    // 添加保存按钮事件处理
+    const saveButton = document.getElementById('save-label-btn');
+    if (saveButton) {
+        saveButton.addEventListener('click', () => {
+            try {
+                // 从共享Label实例获取所有指令
+                const instructions = sharedLabel.getAllInstructions();
+                
+                // 将指令转换为文本格式
+                const labelContent = instructions.map(instruction => 
+                    `${instruction.type},${instruction.params.join(',')}`
+                ).join('\n');
+                
+                // 创建Blob对象
+                const blob = new Blob([labelContent], { type: 'text/plain;charset=utf-8' });
+                
+                // 创建下载链接
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'label.txt';
+                
+                // 触发下载
+                document.body.appendChild(a);
+                a.click();
+                
+                // 清理
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+            } catch (e) {
+                console.error("保存标签指令时出错:", e);
+                alert('保存失败，请查看控制台了解详情。');
+            }
+        });
+    }
 });

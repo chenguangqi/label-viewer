@@ -181,6 +181,7 @@ header h1::after {
 /* 标签设计器区域样式 */
 .designer-section {
     display: flex;
+    flex-direction: column;
     background: white;
     padding: 20px;
     border-radius: 10px;
@@ -198,6 +199,47 @@ header h1::after {
     height: 100%;
     display: flex;
     box-sizing: border-box;
+    flex: 1;
+}
+
+.designer-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 15px;
+    box-sizing: border-box;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.btn-primary {
+    background-color: #3498db;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn i {
+    margin-right: 8px;
 }
 
 #visual-designer {
