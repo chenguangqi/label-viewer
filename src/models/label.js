@@ -114,19 +114,6 @@ class Label {
      */
     clear() {
         this.instructions = [];
-        // 保留nextId，避免ID重复
-    }
-    
-    /**
-     * 将指令列表转换为文本格式
-     * @returns {string} 指令文本
-     */
-    toText() {
-        let text = '';
-        for (const instruction of this.instructions) {
-            text += instruction.type + ',' + instruction.params.join(',') + '\n';
-        }
-        return text.trim();
     }
     
     /**
@@ -136,11 +123,18 @@ class Label {
     loadFromInstructions(instructions) {
         this.clear();
         for (const instruction of instructions) {
-            this.addInstruction({
-                type: instruction.type,
-                params: instruction.params
-            });
+            this.addInstruction(instruction);
         }
+    }
+    
+    /**
+     * 转换为文本格式
+     * @returns {string} 指令文本
+     */
+    toText() {
+        return this.instructions.map(inst => 
+            `${inst.type},${inst.params.join(',')}`
+        ).join('\n');
     }
 }
 

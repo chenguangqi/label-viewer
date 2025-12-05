@@ -8,40 +8,42 @@ document.addEventListener('DOMContentLoaded', () => {
     // 获取DOM元素
     const instructionInput = document.getElementById('instruction-input');
     const labelPreview = document.getElementById('label-preview');
-    const visualDesignerElement = document.getElementById('visual-designer');
-    const toolbox = document.getElementById('toolbox');
+    const helpContent = document.getElementById('current-instruction-help');
     const propertiesPanel = document.getElementById('properties-panel');
     const propertiesContent = document.getElementById('properties-content');
-    const helpContent = document.getElementById('current-instruction-help');
     
-    // 获取标签页相关元素
+    // 初始化模块
+    const renderer = new LabelRenderer(labelPreview);
+    const helpData = window.HelpData || 
+                     (typeof require !== 'undefined' ? require('../models/help-data.js') : null);
+    
+    // 创建可视化设计器实例
+    const visualDesignerContainer = document.getElementById('visual-designer');
+    let visualDesigner = null;
+    
+    if (visualDesignerContainer) {
+        visualDesigner = new VisualDesigner(visualDesignerContainer, (instruction) => {
+            // 当元素被选中时更新属性面板
+            onElementSelected(instruction);
+        });
+    }
+    
+    // 同步标志，防止循环更新
+    let isSyncing = false;
+    
+    // 绑定标签页切换事件
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabPanes = document.querySelectorAll('.tab-pane');
     
-    // 初始化模块
-    const parser = window.InstructionParser || 
-                  (typeof require !== 'undefined' ? require('./instruction-parser.js') : null);
-    const renderer = new LabelRenderer(labelPreview);
-    const helpData = window.HelpData || 
-                     (typeof require !== 'undefined' ? require('./help-data.js') : null);
-    
-    // 初始化Label实例
-    const label = new Label();
-    
-    // 初始化可视化设计器
-    let visualDesigner = null;
-    let isSyncing = false; // 防止循环更新
-    
-    // 绑定标签页切换事件
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
-            const tabId = button.dataset.tab;
+            const tabId = button.getAttribute('data-tab');
             
             // 更新活动标签按钮
             tabButtons.forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
             
-            // 显示对应的标签页
+            // 显示对应的标签内容
             tabPanes.forEach(pane => {
                 pane.classList.remove('active');
                 if (pane.id === tabId) {
@@ -49,40 +51,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
             
-            // 特殊处理可视化编辑模式标签页
-            if (tabId === 'designer-tab') {
-                // 显示工具箱
-                toolbox.style.display = 'block';
-                
-                // 初始化可视化设计器
-                if (!visualDesigner) {
-                    visualDesigner = new VisualDesigner(visualDesignerElement, onElementSelected);
-                    
-                    // 绑定设计器更新事件
-                    visualDesigner.onUpdate = () => {
-                        if (!isSyncing) {
-                            syncDesignerToEditor();
-                        }
-                    };
-                }
-                
-                // 加载当前指令到设计器
-                const instructionsText = instructionInput.value;
-                const instructions = InstructionParser.parseText(instructionsText);
-                visualDesigner.loadInstructions(instructions);
-            } else {
-                // 隐藏工具箱和属性面板
-                toolbox.style.display = 'none';
-                if (propertiesPanel) {
-                    propertiesPanel.style.display = 'none';
-                }
-            }
-            
-            // 当切换到预览模式时，自动渲染标签
+            // 特殊处理预览标签
             if (tabId === 'preview-tab') {
                 const instructionsText = instructionInput.value;
                 const instructions = InstructionParser.parseText(instructionsText);
                 renderer.render(instructions);
+            }
+            
+            // 特殊处理设计器标签
+            if (tabId === 'designer-tab') {
+                // 显示属性面板
+                if (propertiesPanel) {
+                    propertiesPanel.style.display = 'block';
+                }
+                
+                // 同步代码到设计器
+                syncEditorToDesigner();
+            } else {
+                // 隐藏属性面板
+                if (propertiesPanel) {
+                    propertiesPanel.style.display = 'none';
+                }
             }
         });
     });
@@ -90,43 +79,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // 绑定输入框光标位置变化事件
     instructionInput.addEventListener('keyup', () => {
         updateHelp();
-        
-        // 在可视化编辑模式标签页激活时，同步代码模式到可视化编辑模式
-        const activeTab = document.querySelector('.tab-button.active').dataset.tab;
-        if (activeTab === 'designer-tab' && !isSyncing) {
-            syncEditorToDesigner();
-        }
     });
     
     instructionInput.addEventListener('click', () => {
         updateHelp();
     });
     
-    // 绑定输入框失焦事件，用于同步
-    instructionInput.addEventListener('blur', () => {
-        const activeTab = document.querySelector('.tab-button.active').dataset.tab;
-        if (activeTab === 'designer-tab' && !isSyncing) {
-            syncEditorToDesigner();
-        }
-    });
-    
     // 绑定Ctrl+Enter快捷键渲染
     instructionInput.addEventListener('keydown', (event) => {
         if (event.ctrlKey && event.key === 'Enter') {
-            // 切换到预览模式并渲染
+            // 切换到预览模式
             const previewTabButton = document.querySelector('[data-tab="preview-tab"]');
             if (previewTabButton) {
                 previewTabButton.click();
             }
         }
-    });
-    
-    // 绑定工具箱项目的拖拽事件
-    const toolboxItems = document.querySelectorAll('.toolbox-item');
-    toolboxItems.forEach(item => {
-        item.addEventListener('dragstart', (e) => {
-            e.dataTransfer.setData('text/plain', item.dataset.type);
-        });
     });
     
     // 同步代码模式到可视化编辑模式
@@ -137,6 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
             isSyncing = true;
             const instructionsText = instructionInput.value;
             const instructions = InstructionParser.parseText(instructionsText);
+            
             if (visualDesigner) {
                 visualDesigner.loadInstructions(instructions);
             }
@@ -299,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 更新指令输入框中的文本
                 updateInstructionInTextarea(instruction.type, property, value);
                 
-                // 同步可视化编辑模式到代码模式
+                // 同步设计器到编辑器
                 if (!isSyncing) {
                     syncDesignerToEditor();
                 }
