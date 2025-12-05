@@ -37,19 +37,19 @@
 
 ### 基础语法
 ```
-label,<宽度>,<高度>,<背景色>,<内边距>
-text,<X坐标>,<Y坐标>,<宽度>,<高度>,<字体大小>,<字体族>,<字体粗细>,<对齐方式>,<颜色>,<文本内容>
-barcode,<条码类型>,<X坐标>,<Y坐标>,<宽度>,<高度>,<是否显示值>,<条码数据>
-qrcode,<X坐标>,<Y坐标>,<尺寸>,<纠错等级>,<二维码数据>
-image,<X坐标>,<Y坐标>,<宽度>,<高度>,<图片路径>
-line,<起点X>,<起点Y>,<终点X>,<终点Y>,<线条粗细>,<颜色>
-rectangle,<X坐标>,<Y坐标>,<宽度>,<高度>,<边框粗细>,<填充颜色>,<边框颜色>
+label,<width>,<height>,<background>,<padding>
+text,<x>,<y>,<width>,<height>,<font-size>,<font-family>,<font-weight>,<text-align>,<color>,<text>
+barcode,<type>,<x>,<y>,<width>,<height>,<display-value>,<data>
+qrcode,<x>,<y>,<size>,<ecc>,<data>
+image,<x>,<y>,<width>,<height>,<src>
+line,<x1>,<y1>,<x2>,<y2>,<stroke>,<color>
+rectangle,<x>,<y>,<width>,<height>,<stroke>,<fill>,<color>
 ```
 
 ### 参数说明
 - 所有参数均为必填项，按照预定义顺序提供完整值
 - 所有坐标值（x, y, x1, y1, x2, y2等）和尺寸参数（width, height, size, stroke等）使用"dot"作为单位
-- 数据类参数（如文本内容、条码数据、二维码数据、文件路径等）位于参数列表末尾，防止干扰其他参数解析
+- 数据类参数（如text、data、src等）位于参数列表末尾，防止干扰其他参数解析
 - 指令不需要使用中括号`[]`包裹，直接以指令名开始
 - 每行仅包含一个指令
 - 以`#`开始的行被视为注释，将被解析器忽略
