@@ -26,9 +26,6 @@ class LabelDesigner {
         // 创建元素
         this.createElements();
         
-        // 设置样式
-        this.setupStyles();
-        
         // 绑定事件
         this.bindEvents();
         
@@ -47,25 +44,6 @@ class LabelDesigner {
         
         this.designerContainer.appendChild(this.canvas);
         this.container.appendChild(this.designerContainer);
-    }
-    
-    setupStyles() {
-        // 设置设计器容器样式
-        Object.assign(this.designerContainer.style, {
-            position: 'relative',
-            width: '100%',
-            height: '100%',
-            border: '1px solid #ccc',
-            backgroundColor: '#f9f9f9',
-            overflow: 'hidden'
-        });
-        
-        // 设置画布样式
-        Object.assign(this.canvas.style, {
-            position: 'relative',
-            width: '100%',
-            height: '100%'
-        });
     }
     
     initToolboxDrag() {
@@ -132,7 +110,10 @@ class LabelDesigner {
         
         // 触发属性面板更新
         if (this.onInstructionChange) {
-            this.onInstructionChange(this.getElementInstruction(element));
+            const elementData = this.elements.find(el => el.element === element);
+            if (elementData) {
+                this.onInstructionChange(this.getElementInstruction(elementData));
+            }
         }
     }
     
@@ -162,6 +143,11 @@ class LabelDesigner {
         x = Math.max(0, Math.min(x, containerRect.width - this.selectedElement.offsetWidth));
         y = Math.max(0, Math.min(y, containerRect.height - this.selectedElement.offsetHeight));
         
+        // 网格吸附 - 将元素位置对齐到20x20像素的网格
+        const gridSize = 20;
+        x = Math.round(x / gridSize) * gridSize;
+        y = Math.round(y / gridSize) * gridSize;
+        
         this.selectedElement.style.left = `${x}px`;
         this.selectedElement.style.top = `${y}px`;
         
@@ -170,7 +156,7 @@ class LabelDesigner {
         if (elementData) {
             elementData.x = x;
             elementData.y = y;
-            this.updateInstruction(elementData);
+            this.updateInstructionParams(elementData, x, y);
         }
     }
     
@@ -277,20 +263,126 @@ class LabelDesigner {
         return elementData;
     }
     
-    updateElementProperty(elementData, property, value) {
-        const index = this.elements.indexOf(elementData);
-        if (index !== -1) {
-            // 创建指令对象
-            const instructionObj = { type: elementData.type, params: elementData.params };
-            
-            // 创建指令类实例
-            const instructionInstance = InstructionParser.createInstructionInstance(instructionObj);
-            
-            // 更新标签设计器元素属性
-            instructionInstance.updateDesignerElementProperty(elementData, property, value);
-            
-            this.updateInstruction(elementData);
+    updateElementProperty(element, property, value) {
+        const elementData = this.elements.find(el => el.element === element);
+        if (elementData) {
+            const index = this.elements.indexOf(elementData);
+            if (index !== -1) {
+                // 创建指令对象
+                const instructionObj = { type: elementData.type, params: [...elementData.params] };
+                
+                // 创建指令类实例
+                const instructionInstance = InstructionParser.createInstructionInstance(instructionObj);
+                
+                // 更新标签设计器元素属性
+                instructionInstance.updateDesignerElementProperty(elementData, property, value);
+                
+                // 更新参数
+                switch (property) {
+                    case 'x':
+                        if (elementData.type === 'barcode') {
+                            elementData.params[1] = value;
+                        } else {
+                            elementData.params[0] = value;
+                        }
+                        break;
+                    case 'y':
+                        if (elementData.type === 'barcode') {
+                            elementData.params[2] = value;
+                        } else {
+                            elementData.params[1] = value;
+                        }
+                        break;
+                    case 'width':
+                        if (elementData.type === 'text') {
+                            elementData.params[2] = value;
+                        } else if (elementData.type === 'barcode') {
+                            elementData.params[3] = value;
+                        } else if (['image', 'rectangle'].includes(elementData.type)) {
+                            elementData.params[2] = value;
+                        }
+                        break;
+                    case 'height':
+                        if (elementData.type === 'text') {
+                            elementData.params[3] = value;
+                        } else if (elementData.type === 'barcode') {
+                            elementData.params[4] = value;
+                        } else if (['image', 'rectangle'].includes(elementData.type)) {
+                            elementData.params[3] = value;
+                        }
+                        break;
+                    case 'text':
+                        if (elementData.type === 'text') {
+                            elementData.params[9] = value;
+                        }
+                        break;
+                    case 'size':
+                        if (elementData.type === 'qrcode') {
+                            elementData.params[2] = value;
+                        }
+                        break;
+                    case 'x1':
+                        if (elementData.type === 'line') {
+                            elementData.params[0] = value;
+                        }
+                        break;
+                    case 'y1':
+                        if (elementData.type === 'line') {
+                            elementData.params[1] = value;
+                        }
+                        break;
+                    case 'x2':
+                        if (elementData.type === 'line') {
+                            elementData.params[2] = value;
+                        }
+                        break;
+                    case 'y2':
+                        if (elementData.type === 'line') {
+                            elementData.params[3] = value;
+                        }
+                        break;
+                }
+                
+                this.updateInstruction(elementData);
+            }
         }
+    }
+    
+    updateInstructionParams(elementData, x, y) {
+        // 根据元素类型更新参数中的位置信息
+        switch (elementData.type) {
+            case 'text':
+                elementData.params[0] = x;
+                elementData.params[1] = y;
+                break;
+            case 'barcode':
+                elementData.params[1] = x;
+                elementData.params[2] = y;
+                break;
+            case 'qrcode':
+                elementData.params[0] = x;
+                elementData.params[1] = y;
+                break;
+            case 'image':
+                elementData.params[0] = x;
+                elementData.params[1] = y;
+                break;
+            case 'rectangle':
+                elementData.params[0] = x;
+                elementData.params[1] = y;
+                break;
+            case 'line':
+                // 对于线条，我们只更新起点位置，保持相对位置
+                const dx = elementData.params[2] - elementData.params[0];
+                const dy = elementData.params[3] - elementData.params[1];
+                elementData.params[0] = x;
+                elementData.params[1] = y;
+                elementData.params[2] = x + dx;
+                elementData.params[3] = y + dy;
+                break;
+        }
+        
+        this.updateInstruction(elementData);
     }
     
     getElementInstruction(elementData) {
@@ -351,14 +443,12 @@ class LabelDesigner {
                     break;
             }
             
-            // 创建标签设计器元素
-            const elementData = instructionInstance.createDesignerElement(x, y);
-            this.elements.push(elementData);
-            this.canvas.appendChild(elementData.element);
+            // 创建元素
+            const elementData = this.createElement(instruction.type, params);
+            
+            // 添加到Label实例中
+            this.label.addInstruction(instruction);
         }
-        
-        // 加载到Label实例中
-        this.label.loadFromInstructions(instructions);
     }
     
     getAllInstructions() {
@@ -367,6 +457,14 @@ class LabelDesigner {
     
     getLabel() {
         return this.label;
+    }
+    
+    get selectedElement() {
+        return this._selectedElement;
+    }
+    
+    set selectedElement(element) {
+        this._selectedElement = element;
     }
 }
 

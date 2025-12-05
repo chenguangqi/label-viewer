@@ -250,6 +250,8 @@ header h1::after {
 .designer-toolbox .toolbox-item {
     display: flex;
     flex-direction: row; /* 水平排列 */
+    align-items: center; /* 垂直居中 */
+    justify-content: center; /* 水平居中 */
     padding: 10px;
     background: #f8f9fa;
     border-radius: 6px;
@@ -257,6 +259,7 @@ header h1::after {
     transition: all 0.2s ease;
     border: 1px solid #e9ecef;
     gap: 8px; /* 添加图标和文字之间的间距 */
+    text-align: center; /* 文本居中 */
 }
 
 .designer-toolbox .toolbox-item:hover {
@@ -279,6 +282,21 @@ header h1::after {
     font-size: 14px;
     color: #495057;
     white-space: nowrap; /* 防止文字换行 */
+    flex: 1; /* 让文本占据可用空间 */
+}
+
+/* 设计器容器样式 */
+.designer-container {
+    flex: 1;
+    border: 2px dashed #bdc3c7;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* 设计器画布网格背景样式 */
