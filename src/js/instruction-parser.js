@@ -56,6 +56,61 @@ class InstructionParser {
         
         return instructions;
     }
+    
+    /**
+     * 创建指令类实例
+     * @param {Object} instructionObj - 指令对象 {type, params}
+     * @returns {Instruction} 对应的指令类实例
+     */
+    static createInstructionInstance(instructionObj) {
+        // 确保已加载指令类
+        if (typeof window === 'undefined') {
+            // Node.js环境
+            const { 
+                TextInstruction, 
+                BarcodeInstruction, 
+                QRCodeInstruction, 
+                ImageInstruction, 
+                LineInstruction, 
+                RectangleInstruction 
+            } = require('./instruction.js');
+            
+            switch (instructionObj.type) {
+                case 'text':
+                    return new TextInstruction(instructionObj.params);
+                case 'barcode':
+                    return new BarcodeInstruction(instructionObj.params);
+                case 'qrcode':
+                    return new QRCodeInstruction(instructionObj.params);
+                case 'image':
+                    return new ImageInstruction(instructionObj.params);
+                case 'line':
+                    return new LineInstruction(instructionObj.params);
+                case 'rectangle':
+                    return new RectangleInstruction(instructionObj.params);
+                default:
+                    throw new Error(`Unknown instruction type: ${instructionObj.type}`);
+            }
+        } else {
+            // 浏览器环境
+            switch (instructionObj.type) {
+                case 'text':
+                    return new window.TextInstruction(instructionObj.params);
+                case 'barcode':
+                    return new window.BarcodeInstruction(instructionObj.params);
+                case 'qrcode':
+                    return new window.QRCodeInstruction(instructionObj.params);
+                case 'image':
+                    return new window.ImageInstruction(instructionObj.params);
+                case 'line':
+                    return new window.LineInstruction(instructionObj.params);
+                case 'rectangle':
+                    return new window.RectangleInstruction(instructionObj.params);
+                default:
+                    throw new Error(`Unknown instruction type: ${instructionObj.type}`);
+            }
+        }
+    }
 }
 
 // 确保在浏览器环境中将InstructionParser附加到window对象

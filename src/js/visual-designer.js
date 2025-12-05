@@ -187,131 +187,55 @@ class VisualDesigner {
     }
     
     createElement(type, params) {
-        const element = document.createElement('div');
-        element.className = 'draggable-element';
-        element.style.position = 'absolute';
-        element.style.cursor = 'move';
+        // 创建指令对象
+        const instructionObj = { type, params };
         
-        let elementData = {
-            element: element,
-            type: type,
-            params: [...params]
-        };
+        // 创建指令类实例
+        const instructionInstance = InstructionParser.createInstructionInstance(instructionObj);
         
+        // 创建设计器元素
+        let elementData;
         switch (type) {
             case 'text':
-                elementData.x = parseFloat(params[0]) || 0;
-                elementData.y = parseFloat(params[1]) || 0;
-                elementData.width = parseFloat(params[2]) || 100;
-                elementData.height = parseFloat(params[3]) || 30;
-                elementData.text = params[9] || '文本';
-                
-                element.style.left = `${elementData.x}px`;
-                element.style.top = `${elementData.y}px`;
-                element.style.width = `${elementData.width}px`;
-                element.style.height = `${elementData.height}px`;
-                element.style.backgroundColor = '#fff';
-                element.style.border = '1px solid #ccc';
-                element.style.display = 'flex';
-                element.style.alignItems = 'center';
-                element.style.justifyContent = 'center';
-                element.style.fontSize = `${parseFloat(params[4]) || 12}px`;
-                element.textContent = elementData.text;
+                elementData = instructionInstance.createDesignerElement(
+                    parseFloat(params[0]) || 0, 
+                    parseFloat(params[1]) || 0
+                );
                 break;
-                
             case 'barcode':
-                elementData.x = parseFloat(params[1]) || 0;
-                elementData.y = parseFloat(params[2]) || 0;
-                elementData.width = parseFloat(params[3]) || 100;
-                elementData.height = parseFloat(params[4]) || 30;
-                
-                element.style.left = `${elementData.x}px`;
-                element.style.top = `${elementData.y}px`;
-                element.style.width = `${elementData.width}px`;
-                element.style.height = `${elementData.height}px`;
-                element.style.backgroundColor = '#fff';
-                element.style.border = '1px solid #000';
-                element.style.display = 'flex';
-                element.style.alignItems = 'center';
-                element.style.justifyContent = 'center';
-                element.textContent = '[BARCODE]';
-                element.style.fontSize = '10px';
+                elementData = instructionInstance.createDesignerElement(
+                    parseFloat(params[1]) || 0, 
+                    parseFloat(params[2]) || 0
+                );
                 break;
-                
             case 'qrcode':
-                elementData.x = parseFloat(params[0]) || 0;
-                elementData.y = parseFloat(params[1]) || 0;
-                elementData.size = parseFloat(params[2]) || 50;
-                
-                element.style.left = `${elementData.x}px`;
-                element.style.top = `${elementData.y}px`;
-                element.style.width = `${elementData.size}px`;
-                element.style.height = `${elementData.size}px`;
-                element.style.backgroundColor = '#fff';
-                element.style.border = '1px solid #000';
-                element.style.display = 'flex';
-                element.style.alignItems = 'center';
-                element.style.justifyContent = 'center';
-                element.textContent = '[QR]';
-                element.style.fontSize = '10px';
+                elementData = instructionInstance.createDesignerElement(
+                    parseFloat(params[0]) || 0, 
+                    parseFloat(params[1]) || 0
+                );
                 break;
-                
             case 'image':
-                elementData.x = parseFloat(params[0]) || 0;
-                elementData.y = parseFloat(params[1]) || 0;
-                elementData.width = parseFloat(params[2]) || 50;
-                elementData.height = parseFloat(params[3]) || 50;
-                
-                element.style.left = `${elementData.x}px`;
-                element.style.top = `${elementData.y}px`;
-                element.style.width = `${elementData.width}px`;
-                element.style.height = `${elementData.height}px`;
-                element.style.backgroundColor = '#eee';
-                element.style.border = '1px dashed #999';
-                element.style.display = 'flex';
-                element.style.alignItems = 'center';
-                element.style.justifyContent = 'center';
-                element.textContent = '[IMG]';
-                element.style.fontSize = '10px';
+                elementData = instructionInstance.createDesignerElement(
+                    parseFloat(params[0]) || 0, 
+                    parseFloat(params[1]) || 0
+                );
                 break;
-                
             case 'rectangle':
-                elementData.x = parseFloat(params[0]) || 0;
-                elementData.y = parseFloat(params[1]) || 0;
-                elementData.width = parseFloat(params[2]) || 100;
-                elementData.height = parseFloat(params[3]) || 50;
-                
-                element.style.left = `${elementData.x}px`;
-                element.style.top = `${elementData.y}px`;
-                element.style.width = `${elementData.width}px`;
-                element.style.height = `${elementData.height}px`;
-                element.style.backgroundColor = params[5] || 'transparent';
-                element.style.border = `${parseFloat(params[4]) || 1}px solid ${params[6] || '#000'}`;
+                elementData = instructionInstance.createDesignerElement(
+                    parseFloat(params[0]) || 0, 
+                    parseFloat(params[1]) || 0
+                );
                 break;
-                
             case 'line':
-                elementData.x1 = parseFloat(params[0]) || 0;
-                elementData.y1 = parseFloat(params[1]) || 0;
-                elementData.x2 = parseFloat(params[2]) || 50;
-                elementData.y2 = parseFloat(params[3]) || 50;
-                elementData.stroke = parseFloat(params[4]) || 1;
-                
-                // 计算线段长度和角度
-                const length = Math.sqrt(Math.pow(elementData.x2 - elementData.x1, 2) + Math.pow(elementData.y2 - elementData.y1, 2));
-                const angle = Math.atan2(elementData.y2 - elementData.y1, elementData.x2 - elementData.x1) * 180 / Math.PI;
-                
-                element.style.left = `${elementData.x1}px`;
-                element.style.top = `${elementData.y1}px`;
-                element.style.width = `${length}px`;
-                element.style.height = `${elementData.stroke}px`;
-                element.style.backgroundColor = params[5] || '#000';
-                element.style.transformOrigin = 'left center';
-                element.style.transform = `rotate(${angle}deg)`;
+                elementData = instructionInstance.createDesignerElement(
+                    parseFloat(params[0]) || 0, 
+                    parseFloat(params[1]) || 0
+                );
                 break;
         }
         
         this.elements.push(elementData);
-        this.canvas.appendChild(element);
+        this.canvas.appendChild(elementData.element);
         
         return elementData;
     }
@@ -319,95 +243,16 @@ class VisualDesigner {
     updateElementProperty(elementData, property, value) {
         const index = this.elements.indexOf(elementData);
         if (index !== -1) {
-            switch (property) {
-                case 'x':
-                    elementData.x = parseFloat(value) || 0;
-                    elementData.element.style.left = `${elementData.x}px`;
-                    // 更新参数数组中的值
-                    if (elementData.type === 'text' || elementData.type === 'rectangle') {
-                        elementData.params[0] = value;
-                    } else if (elementData.type === 'barcode') {
-                        elementData.params[1] = value;
-                    } else if (elementData.type === 'qrcode' || elementData.type === 'image') {
-                        elementData.params[0] = value;
-                    } else if (elementData.type === 'line') {
-                        elementData.params[0] = value;
-                        this.redrawLine(elementData);
-                    }
-                    break;
-                    
-                case 'y':
-                    elementData.y = parseFloat(value) || 0;
-                    elementData.element.style.top = `${elementData.y}px`;
-                    // 更新参数数组中的值
-                    if (elementData.type === 'text' || elementData.type === 'rectangle') {
-                        elementData.params[1] = value;
-                    } else if (elementData.type === 'barcode') {
-                        elementData.params[2] = value;
-                    } else if (elementData.type === 'qrcode' || elementData.type === 'image') {
-                        elementData.params[1] = value;
-                    } else if (elementData.type === 'line') {
-                        elementData.params[1] = value;
-                        this.redrawLine(elementData);
-                    }
-                    break;
-                    
-                case 'width':
-                    if (elementData.type !== 'line' && elementData.type !== 'qrcode') {
-                        elementData.width = parseFloat(value) || 0;
-                        elementData.element.style.width = `${elementData.width}px`;
-                        
-                        if (elementData.type === 'text') {
-                            elementData.params[2] = value;
-                        } else if (elementData.type === 'barcode') {
-                            elementData.params[3] = value;
-                        } else if (elementData.type === 'image') {
-                            elementData.params[2] = value;
-                        } else if (elementData.type === 'rectangle') {
-                            elementData.params[2] = value;
-                        }
-                    }
-                    break;
-                    
-                case 'height':
-                    if (elementData.type !== 'line' && elementData.type !== 'qrcode') {
-                        elementData.height = parseFloat(value) || 0;
-                        elementData.element.style.height = `${elementData.height}px`;
-                        
-                        if (elementData.type === 'text') {
-                            elementData.params[3] = value;
-                        } else if (elementData.type === 'barcode') {
-                            elementData.params[4] = value;
-                        } else if (elementData.type === 'image') {
-                            elementData.params[3] = value;
-                        } else if (elementData.type === 'rectangle') {
-                            elementData.params[3] = value;
-                        }
-                    }
-                    break;
-                    
-                case 'text':
-                    if (elementData.type === 'text') {
-                        elementData.text = value;
-                        elementData.element.textContent = value;
-                        elementData.params[9] = value;
-                    }
-                    break;
-            }
+            // 创建指令对象
+            const instructionObj = { type: elementData.type, params: elementData.params };
+            
+            // 创建指令类实例
+            const instructionInstance = InstructionParser.createInstructionInstance(instructionObj);
+            
+            // 更新设计器元素属性
+            instructionInstance.updateDesignerElementProperty(elementData, property, value);
             
             this.updateInstruction(elementData);
-        }
-    }
-    
-    redrawLine(elementData) {
-        if (elementData.type === 'line') {
-            const length = Math.sqrt(Math.pow(elementData.x2 - elementData.x1, 2) + Math.pow(elementData.y2 - elementData.y1, 2));
-            const angle = Math.atan2(elementData.y2 - elementData.y1, elementData.x2 - elementData.x1) * 180 / Math.PI;
-            
-            elementData.element.style.left = `${elementData.x1}px`;
-            elementData.element.style.top = `${elementData.y1}px`;
-            elementData.element.style.width = `${length}px`;
-            elementData.element.style.transform = `rotate(${angle}deg)`;
         }
     }
     
@@ -435,7 +280,44 @@ class VisualDesigner {
         this.clear();
         
         for (const instruction of instructions) {
-            this.createElement(instruction.type, instruction.params);
+            // 创建指令类实例
+            const instructionInstance = InstructionParser.createInstructionInstance(instruction);
+            
+            // 根据指令类型提取坐标参数
+            let params = instruction.params;
+            let x, y;
+            
+            switch (instruction.type) {
+                case 'text':
+                    x = parseFloat(params[0]) || 0;
+                    y = parseFloat(params[1]) || 0;
+                    break;
+                case 'barcode':
+                    x = parseFloat(params[1]) || 0;
+                    y = parseFloat(params[2]) || 0;
+                    break;
+                case 'qrcode':
+                    x = parseFloat(params[0]) || 0;
+                    y = parseFloat(params[1]) || 0;
+                    break;
+                case 'image':
+                    x = parseFloat(params[0]) || 0;
+                    y = parseFloat(params[1]) || 0;
+                    break;
+                case 'rectangle':
+                    x = parseFloat(params[0]) || 0;
+                    y = parseFloat(params[1]) || 0;
+                    break;
+                case 'line':
+                    x = parseFloat(params[0]) || 0;
+                    y = parseFloat(params[1]) || 0;
+                    break;
+            }
+            
+            // 创建设计器元素
+            const elementData = instructionInstance.createDesignerElement(x, y);
+            this.elements.push(elementData);
+            this.canvas.appendChild(elementData.element);
         }
         
         // 加载到Label实例中
