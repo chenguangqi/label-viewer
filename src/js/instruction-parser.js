@@ -6,7 +6,7 @@
 class InstructionParser {
     /**
      * 解析指令字符串
-     * @param {string} instruction - 指令字符串，如 "text,10,5,40,8,产品名称"
+     * @param {string} instruction - 指令字符串，如 "text,10,5,40,8,12,Arial,bold,center,#000000,产品名称"
      * @returns {Object|null} 解析后的指令对象，如果解析失败返回null
      */
     static parse(instruction) {

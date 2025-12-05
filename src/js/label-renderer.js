@@ -111,7 +111,7 @@ class LabelRenderer {
      * @param {Array} params - 参数数组
      */
     _renderText(container, params) {
-        // text,<X坐标>,<Y坐标>,<宽度>,<高度>,<字体大小>,<字体族>,<字体粗细>,<对齐方式>,<颜色>,<文本内容>
+        // text,<x>,<y>,<width>,<height>,<font-size>,<font-family>,<font-weight>,<text-align>,<color>,<text>
         const element = document.createElement('div');
         
         const x = parseFloat(params[0]) || 0;
@@ -152,7 +152,7 @@ class LabelRenderer {
      * @param {Array} params - 参数数组
      */
     _renderBarcode(container, params) {
-        // barcode,<条码类型>,<X坐标>,<Y坐标>,<宽度>,<高度>,<是否显示值>,<条码数据>
+        // barcode,<type>,<x>,<y>,<width>,<height>,<display-value>,<data>
         const element = document.createElement('div');
         
         const type = params[0];
@@ -184,7 +184,7 @@ class LabelRenderer {
      * @param {Array} params - 参数数组
      */
     _renderQRCode(container, params) {
-        // qrcode,<X坐标>,<Y坐标>,<尺寸>,<纠错等级>,<二维码数据>
+        // qrcode,<x>,<y>,<size>,<ecc>,<data>
         const element = document.createElement('div');
         
         const x = parseFloat(params[0]);
@@ -214,7 +214,7 @@ class LabelRenderer {
      * @param {Array} params - 参数数组
      */
     _renderImage(container, params) {
-        // image,<X坐标>,<Y坐标>,<宽度>,<高度>,<图片路径>
+        // image,<x>,<y>,<width>,<height>,<src>
         const element = document.createElement('div');
         
         const x = parseFloat(params[0]);
@@ -244,7 +244,7 @@ class LabelRenderer {
      * @param {Array} params - 参数数组
      */
     _renderLine(container, params) {
-        // line,<起点X>,<起点Y>,<终点X>,<终点Y>,<线条粗细>,<颜色>
+        // line,<x1>,<y1>,<x2>,<y2>,<stroke>,<color>
         const element = document.createElement('div');
         
         const x1 = parseFloat(params[0]);
@@ -276,7 +276,7 @@ class LabelRenderer {
      * @param {Array} params - 参数数组
      */
     _renderRectangle(container, params) {
-        // rectangle,<X坐标>,<Y坐标>,<宽度>,<高度>,<边框粗细>,<填充颜色>,<边框颜色>
+        // rectangle,<x>,<y>,<width>,<height>,<stroke>,<fill>,<color>
         const element = document.createElement('div');
         
         const x = parseFloat(params[0]);

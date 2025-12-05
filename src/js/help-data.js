@@ -8,7 +8,7 @@ const HelpData = {
     instructions: {
         'label': {
             name: '标签整体设置指令 (label)',
-            syntax: 'label,<宽度>,<高度>,<背景色>,<内边距>',
+            syntax: 'label,<width>,<height>,<background>,<padding>',
             description: '用于设置整个标签的基本属性',
             parameters: [
                 { name: 'width', type: 'number', required: '是', validValues: '数值 > 0', description: '标签宽度' },
@@ -23,7 +23,7 @@ const HelpData = {
         },
         'text': {
             name: '文本指令 (text)',
-            syntax: 'text,<X坐标>,<Y坐标>,<宽度>,<高度>,<字体大小>,<字体族>,<字体粗细>,<对齐方式>,<颜色>,<文本内容>',
+            syntax: 'text,<x>,<y>,<width>,<height>,<font-size>,<font-family>,<font-weight>,<text-align>,<color>,<text>',
             description: '用于在标签上显示文本内容',
             parameters: [
                 { name: 'x', type: 'number', required: '是', validValues: '数值 ≥ 0', description: '文本左上角X坐标' },
@@ -44,7 +44,7 @@ const HelpData = {
         },
         'barcode': {
             name: '条形码指令 (barcode)',
-            syntax: 'barcode,<条码类型>,<X坐标>,<Y坐标>,<宽度>,<高度>,<是否显示值>,<条码数据>',
+            syntax: 'barcode,<type>,<x>,<y>,<width>,<height>,<display-value>,<data>',
             description: '用于在标签上生成条形码',
             parameters: [
                 { name: 'type', type: 'string', required: '是', validValues: 'CODE128,EAN13,EAN8,CODE39,CODE93等标准条码类型', description: '条形码类型' },
@@ -62,7 +62,7 @@ const HelpData = {
         },
         'qrcode': {
             name: '二维码指令 (qrcode)',
-            syntax: 'qrcode,<X坐标>,<Y坐标>,<尺寸>,<纠错等级>,<二维码数据>',
+            syntax: 'qrcode,<x>,<y>,<size>,<ecc>,<data>',
             description: '用于在标签上生成二维码',
             parameters: [
                 { name: 'x', type: 'number', required: '是', validValues: '数值 ≥ 0', description: '二维码左上角X坐标' },
@@ -78,7 +78,7 @@ const HelpData = {
         },
         'image': {
             name: '图片指令 (image)',
-            syntax: 'image,<X坐标>,<Y坐标>,<宽度>,<高度>,<图片路径>',
+            syntax: 'image,<x>,<y>,<width>,<height>,<src>',
             description: '用于在标签上插入图片',
             parameters: [
                 { name: 'x', type: 'number', required: '是', validValues: '数值 ≥ 0', description: '图片左上角X坐标' },
@@ -94,7 +94,7 @@ const HelpData = {
         },
         'line': {
             name: '直线指令 (line)',
-            syntax: 'line,<起点X>,<起点Y>,<终点X>,<终点Y>,<线条粗细>,<颜色>',
+            syntax: 'line,<x1>,<y1>,<x2>,<y2>,<stroke>,<color>',
             description: '用于在标签上绘制直线',
             parameters: [
                 { name: 'x1', type: 'number', required: '是', validValues: '数值 ≥ 0', description: '起点X坐标' },
@@ -111,7 +111,7 @@ const HelpData = {
         },
         'rectangle': {
             name: '矩形指令 (rectangle)',
-            syntax: 'rectangle,<X坐标>,<Y坐标>,<宽度>,<高度>,<边框粗细>,<填充颜色>,<边框颜色>',
+            syntax: 'rectangle,<x>,<y>,<width>,<height>,<stroke>,<fill>,<color>',
             description: '用于在标签上绘制矩形',
             parameters: [
                 { name: 'x', type: 'number', required: '是', validValues: '数值 ≥ 0', description: '矩形左上角X坐标' },
