@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentLine = text.split('\n')[currentLineIndex];
         
         // 如果当前行为空或注释，显示默认提示
-        if (!currentLine || currentLine.trim().startsWith('#')) {
+        if (!currentLine || currentLine.trim() === '' || currentLine.trim().startsWith('#')) {
             helpContent.innerHTML = '<p>将光标定位到指令输入框的某一行，此处将显示该行指令的详细帮助信息。</p>';
             return;
         }
@@ -68,6 +68,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const instruction = InstructionParser.parse(currentLine);
         if (!instruction) {
             helpContent.innerHTML = '<p>无法识别的指令格式。请检查指令语法是否正确。</p>';
+            return;
+        }
+        
+        // 检查helpData是否存在
+        if (!helpData) {
+            helpContent.innerHTML = '<p>帮助数据未加载。</p>';
             return;
         }
         

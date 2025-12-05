@@ -6,7 +6,7 @@
 class InstructionParser {
     /**
      * 解析指令字符串
-     * @param {string} instruction - 指令字符串，如 "text:10,5,40,8,产品名称"
+     * @param {string} instruction - 指令字符串，如 "text,10,5,40,8,产品名称"
      * @returns {Object|null} 解析后的指令对象，如果解析失败返回null
      */
     static parse(instruction) {
@@ -56,6 +56,11 @@ class InstructionParser {
         
         return instructions;
     }
+}
+
+// 确保在浏览器环境中将InstructionParser附加到window对象
+if (typeof window !== 'undefined') {
+    window.InstructionParser = InstructionParser;
 }
 
 // 导出模块（用于支持模块化加载）

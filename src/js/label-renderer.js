@@ -68,10 +68,10 @@ class LabelRenderer {
      */
     _parseLabelSettings(params) {
         return {
-            width: parseFloat(params[0]) || 200,
-            height: parseFloat(params[1]) || 100,
-            background: params[2] || '#FFFFFF',
-            padding: parseFloat(params[3]) || 0
+            width: parseFloat(params[0]),
+            height: parseFloat(params[1]),
+            background: params[2],
+            padding: parseFloat(params[3])
         };
     }
     
@@ -155,13 +155,13 @@ class LabelRenderer {
         // barcode,<条码类型>,<X坐标>,<Y坐标>,<宽度>,<高度>,<是否显示值>,<条码数据>
         const element = document.createElement('div');
         
-        const type = params[0] || 'CODE128';
-        const x = parseFloat(params[1]) || 0;
-        const y = parseFloat(params[2]) || 0;
-        const width = parseFloat(params[3]) || 50;
-        const height = parseFloat(params[4]) || 10;
+        const type = params[0];
+        const x = parseFloat(params[1]);
+        const y = parseFloat(params[2]);
+        const width = parseFloat(params[3]);
+        const height = parseFloat(params[4]);
         const displayValue = params[5] === 'true';
-        const data = params[6] || '';
+        const data = params[6];
         
         element.textContent = displayValue ? data : '';
         element.style.position = 'absolute';
@@ -187,11 +187,11 @@ class LabelRenderer {
         // qrcode,<X坐标>,<Y坐标>,<尺寸>,<纠错等级>,<二维码数据>
         const element = document.createElement('div');
         
-        const x = parseFloat(params[0]) || 0;
-        const y = parseFloat(params[1]) || 0;
-        const size = parseFloat(params[2]) || 20;
-        const ecc = params[3] || 'M';
-        const data = params[4] || '';
+        const x = parseFloat(params[0]);
+        const y = parseFloat(params[1]);
+        const size = parseFloat(params[2]);
+        const ecc = params[3];
+        const data = params[4];
         
         element.textContent = '[QR]';
         element.style.position = 'absolute';
@@ -217,11 +217,11 @@ class LabelRenderer {
         // image,<X坐标>,<Y坐标>,<宽度>,<高度>,<图片路径>
         const element = document.createElement('div');
         
-        const x = parseFloat(params[0]) || 0;
-        const y = parseFloat(params[1]) || 0;
-        const width = parseFloat(params[2]) || 50;
-        const height = parseFloat(params[3]) || 50;
-        const src = params[4] || '';
+        const x = parseFloat(params[0]);
+        const y = parseFloat(params[1]);
+        const width = parseFloat(params[2]);
+        const height = parseFloat(params[3]);
+        const src = params[4];
         
         element.textContent = '[IMG]';
         element.style.position = 'absolute';
@@ -247,12 +247,12 @@ class LabelRenderer {
         // line,<起点X>,<起点Y>,<终点X>,<终点Y>,<线条粗细>,<颜色>
         const element = document.createElement('div');
         
-        const x1 = parseFloat(params[0]) || 0;
-        const y1 = parseFloat(params[1]) || 0;
-        const x2 = parseFloat(params[2]) || 0;
-        const y2 = parseFloat(params[3]) || 0;
-        const stroke = parseFloat(params[4]) || 1;
-        const color = params[5] || '#000000';
+        const x1 = parseFloat(params[0]);
+        const y1 = parseFloat(params[1]);
+        const x2 = parseFloat(params[2]);
+        const y2 = parseFloat(params[3]);
+        const stroke = parseFloat(params[4]);
+        const color = params[5];
         
         // 计算线段长度和角度
         const length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
@@ -279,13 +279,13 @@ class LabelRenderer {
         // rectangle,<X坐标>,<Y坐标>,<宽度>,<高度>,<边框粗细>,<填充颜色>,<边框颜色>
         const element = document.createElement('div');
         
-        const x = parseFloat(params[0]) || 0;
-        const y = parseFloat(params[1]) || 0;
-        const width = parseFloat(params[2]) || 50;
-        const height = parseFloat(params[3]) || 30;
-        const strokeWidth = parseFloat(params[4]) || 1;
-        const fillColor = params[5] || 'transparent';
-        const strokeColor = params[6] || '#000000';
+        const x = parseFloat(params[0]);
+        const y = parseFloat(params[1]);
+        const width = parseFloat(params[2]);
+        const height = parseFloat(params[3]);
+        const strokeWidth = parseFloat(params[4]);
+        const fillColor = params[5];
+        const strokeColor = params[6];
         
         element.style.position = 'absolute';
         element.style.left = `${x}px`;
@@ -297,6 +297,11 @@ class LabelRenderer {
         
         container.appendChild(element);
     }
+}
+
+// 确保在浏览器环境中将LabelRenderer附加到window对象
+if (typeof window !== 'undefined') {
+    window.LabelRenderer = LabelRenderer;
 }
 
 // 导出模块（用于支持模块化加载）
