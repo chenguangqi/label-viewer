@@ -6,9 +6,9 @@
 // 等待DOM加载完成
 document.addEventListener('DOMContentLoaded', () => {
     // 获取DOM元素
-    const propertiesPanel = document.getElementById('properties-panel');
+    const propertiesPanel = document.querySelector('#properties-panel.designer-properties-panel');
     const propertiesContent = document.getElementById('properties-content');
-    const toolbox = document.getElementById('toolbox'); // 获取工具箱元素
+    const toolbox = document.querySelector('#toolbox.designer-toolbox'); // 获取设计器内的工具箱元素
     
     const helpData = window.HelpData || 
                      (typeof require !== 'undefined' ? require('../models/help-data.js') : null);
