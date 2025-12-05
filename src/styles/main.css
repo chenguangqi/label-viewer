@@ -281,6 +281,18 @@ header h1::after {
     white-space: nowrap; /* 防止文字换行 */
 }
 
+/* 设计器画布网格背景样式 */
+.designer-canvas {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(#e0e0e0 1px, transparent 1px),
+        linear-gradient(90deg, #e0e0e0 1px, transparent 1px);
+    background-size: 20px 20px;
+    background-position: 0 0;
+}
+
 /* 属性面板样式（设计器内部） */
 .designer-properties-panel {
     width: 300px;
