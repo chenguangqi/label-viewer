@@ -7,6 +7,7 @@ class VisualDesigner {
     constructor(container, onInstructionChange) {
         this.container = container;
         this.onInstructionChange = onInstructionChange;
+        this.onUpdate = null; // 添加更新回调
         this.selectedElement = null;
         this.elements = [];
         this.isDragging = false;
@@ -73,6 +74,10 @@ class VisualDesigner {
             const type = e.dataTransfer.getData('text/plain');
             if (type) {
                 this.addElementFromToolbox(type, e.clientX, e.clientY);
+                // 触发更新回调
+                if (this.onUpdate) {
+                    this.onUpdate();
+                }
             }
         });
     }
@@ -133,6 +138,10 @@ class VisualDesigner {
     
     stopDrag() {
         this.isDragging = false;
+        // 拖拽结束后触发更新回调
+        if (this.onUpdate) {
+            this.onUpdate();
+        }
     }
     
     addElementFromToolbox(type, clientX, clientY) {

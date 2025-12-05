@@ -14,34 +14,57 @@
             <h1><i class="fas fa-tag"></i> 商品标签伪指令设计和实现渲染查看器</h1>
         </header>
         
-        <div class="main-content">
-            <div class="editor-section">
-                <div class="input-group">
-                    <label for="instruction-input"><i class="fas fa-code"></i> 标签指令:</label>
-                    <textarea id="instruction-input" placeholder="在此输入标签指令，每行一条&#10;以#开始的行是注释&#10;例如:&#10;# 这是一个标签示例&#10;label,70,40&#10;text,10,5,40,8,12,Arial,bold,center,#000000,产品名称">&#10;# 这是一个商品标签示例&#10;label,70,40&#10;text,10,5,40,8,12,Arial,bold,center,#000000,产品名称&#10;barcode,CODE128,5,15,50,10,true,1234567890128&#10;qrcode,45,15,20,Q,https://example.com/product/12345</textarea>
-                </div>
-                
-                <div class="button-group">
-                    <button id="render-btn"><i class="fas fa-play"></i> 渲染标签</button>
-                    <button id="clear-btn"><i class="fas fa-trash-alt"></i> 清空</button>
-                    <button id="design-btn"><i class="fas fa-paint-brush"></i> 可视化设计</button>
+        <!-- 标签页导航 -->
+        <div class="tab-navigation">
+            <button class="tab-button active" data-tab="editor-tab">
+                <i class="fas fa-code"></i> 代码模式
+            </button>
+            <button class="tab-button" data-tab="designer-tab">
+                <i class="fas fa-paint-brush"></i> 可视化编辑模式
+            </button>
+            <button class="tab-button" data-tab="preview-tab">
+                <i class="fas fa-eye"></i> 预览模式
+            </button>
+        </div>
+        
+        <!-- 标签页内容 -->
+        <div class="tab-content">
+            <!-- 标签指令编辑区 -->
+            <div id="editor-tab" class="tab-pane active">
+                <div class="editor-section">
+                    <div class="input-group">
+                        <label for="instruction-input"><i class="fas fa-code"></i> 标签指令:</label>
+                        <textarea id="instruction-input" placeholder="在此输入标签指令，每行一条&#10;以#开始的行是注释&#10;例如:&#10;# 这是一个标签示例&#10;label,70,40&#10;text,10,5,40,8,12,Arial,bold,center,#000000,产品名称">&#10;# 这是一个商品标签示例&#10;label,70,40&#10;text,10,5,40,8,12,Arial,bold,center,#000000,产品名称&#10;barcode,CODE128,5,15,50,10,true,1234567890128&#10;qrcode,45,15,20,Q,https://example.com/product/12345</textarea>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button id="render-btn"><i class="fas fa-play"></i> 渲染标签</button>
+                        <button id="clear-btn"><i class="fas fa-trash-alt"></i> 清空</button>
+                    </div>
                 </div>
             </div>
             
-            <div class="preview-section">
-                <h2><i class="fas fa-eye"></i> 标签预览</h2>
-                <div id="label-preview"></div>
-                
-                <!-- 可视化设计器区域 -->
-                <div id="designer-section" style="display: none;">
-                    <h2><i class="fas fa-ruler-combined"></i> 可视化设计器</h2>
+            <!-- 可视化设计区 -->
+            <div id="designer-tab" class="tab-pane">
+                <div class="designer-section">
+                    <div class="designer-header">
+                        <h2><i class="fas fa-ruler-combined"></i> 可视化设计器</h2>
+                    </div>
                     <div id="visual-designer"></div>
+                </div>
+            </div>
+            
+            <!-- 标签预览区 -->
+            <div id="preview-tab" class="tab-pane">
+                <div class="preview-section">
+                    <h2><i class="fas fa-eye"></i> 标签预览</h2>
+                    <div id="label-preview"></div>
                 </div>
             </div>
         </div>
         
         <!-- 指令控件列表 -->
-        <div id="toolbox" class="toolbox" style="display: none;">
+        <div id="toolbox" class="toolbox">
             <h3><i class="fas fa-toolbox"></i> 指令控件</h3>
             <div class="toolbox-content">
                 <div class="toolbox-item" data-type="text" draggable="true">
@@ -72,7 +95,7 @@
         </div>
         
         <!-- 属性面板 -->
-        <div id="properties-panel" class="properties-panel" style="display: none;">
+        <div id="properties-panel" class="properties-panel">
             <h3><i class="fas fa-sliders-h"></i> 属性面板</h3>
             <div id="properties-content"></div>
         </div>
