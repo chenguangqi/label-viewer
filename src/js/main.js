@@ -9,7 +9,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const instructionInput = document.getElementById('instruction-input');
     const renderButton = document.getElementById('render-btn');
     const clearButton = document.getElementById('clear-btn');
+    const designButton = document.getElementById('design-btn');
     const labelPreview = document.getElementById('label-preview');
+    const designerSection = document.getElementById('designer-section');
+    const visualDesignerElement = document.getElementById('visual-designer');
+    const propertiesPanel = document.getElementById('properties-panel');
+    const propertiesContent = document.getElementById('properties-content');
     const helpContent = document.getElementById('current-instruction-help');
     
     // 初始化模块
@@ -19,8 +24,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const helpData = window.HelpData || 
                      (typeof require !== 'undefined' ? require('./help-data.js') : null);
     
+    // 初始化可视化设计器
+    let visualDesigner = null;
+    let isDesignMode = false;
+    
     // 绑定渲染按钮事件
     renderButton.addEventListener('click', () => {
+        if (isDesignMode) {
+            toggleDesignMode();
+        }
+        
         const instructionsText = instructionInput.value;
         const instructions = InstructionParser.parseText(instructionsText);
         renderer.render(instructions);
@@ -32,6 +45,15 @@ document.addEventListener('DOMContentLoaded', () => {
         labelPreview.innerHTML = '';
         helpContent.innerHTML = '<p><i class="fas fa-info-circle"></i> 将光标定位到指令输入框的某一行，此处将显示该行指令的详细帮助信息。</p>';
         instructionInput.focus();
+        
+        if (visualDesigner) {
+            visualDesigner.clear();
+        }
+    });
+    
+    // 绑定可视化设计按钮事件
+    designButton.addEventListener('click', () => {
+        toggleDesignMode();
     });
     
     // 绑定输入框光标位置变化事件
@@ -49,6 +71,167 @@ document.addEventListener('DOMContentLoaded', () => {
             renderButton.click();
         }
     });
+    
+    // 切换设计模式
+    function toggleDesignMode() {
+        isDesignMode = !isDesignMode;
+        
+        if (isDesignMode) {
+            // 显示设计器区域
+            labelPreview.style.display = 'none';
+            designerSection.style.display = 'flex';
+            propertiesPanel.style.display = 'block';
+            designButton.innerHTML = '<i class="fas fa-code"></i> 返回代码';
+            
+            // 初始化可视化设计器
+            if (!visualDesigner) {
+                visualDesigner = new VisualDesigner(visualDesignerElement, onElementSelected);
+            }
+            
+            // 加载当前指令到设计器
+            const instructionsText = instructionInput.value;
+            const instructions = InstructionParser.parseText(instructionsText);
+            visualDesigner.loadInstructions(instructions);
+        } else {
+            // 显示预览区域
+            labelPreview.style.display = 'block';
+            designerSection.style.display = 'none';
+            propertiesPanel.style.display = 'none';
+            designButton.innerHTML = '<i class="fas fa-paint-brush"></i> 可视化设计';
+        }
+    }
+    
+    // 当元素被选中时更新属性面板
+    function onElementSelected(instruction) {
+        if (!instruction) {
+            propertiesContent.innerHTML = '<p>请选择一个元素以编辑其属性</p>';
+            return;
+        }
+        
+        const helpInfo = helpData.getInstructionHelp(instruction.type);
+        if (!helpInfo) {
+            propertiesContent.innerHTML = '<p>未找到该元素的帮助信息</p>';
+            return;
+        }
+        
+        let html = `<h4>${helpInfo.name}</h4>`;
+        html += '<div class="property-groups">';
+        
+        // 根据元素类型生成属性控件
+        switch (instruction.type) {
+            case 'text':
+                html += createPropertyGroup('位置', [
+                    { label: 'X坐标', name: 'x', value: instruction.params[0] || 0 },
+                    { label: 'Y坐标', name: 'y', value: instruction.params[1] || 0 },
+                    { label: '宽度', name: 'width', value: instruction.params[2] || 100 },
+                    { label: '高度', name: 'height', value: instruction.params[3] || 30 }
+                ]);
+                
+                html += createPropertyGroup('文本', [
+                    { label: '文字内容', name: 'text', value: instruction.params[9] || '', type: 'text' }
+                ]);
+                break;
+                
+            case 'barcode':
+                html += createPropertyGroup('位置和尺寸', [
+                    { label: 'X坐标', name: 'x', value: instruction.params[1] || 0 },
+                    { label: 'Y坐标', name: 'y', value: instruction.params[2] || 0 },
+                    { label: '宽度', name: 'width', value: instruction.params[3] || 100 },
+                    { label: '高度', name: 'height', value: instruction.params[4] || 30 }
+                ]);
+                break;
+                
+            case 'qrcode':
+                html += createPropertyGroup('位置和尺寸', [
+                    { label: 'X坐标', name: 'x', value: instruction.params[0] || 0 },
+                    { label: 'Y坐标', name: 'y', value: instruction.params[1] || 0 },
+                    { label: '尺寸', name: 'size', value: instruction.params[2] || 50 }
+                ]);
+                break;
+                
+            case 'image':
+                html += createPropertyGroup('位置和尺寸', [
+                    { label: 'X坐标', name: 'x', value: instruction.params[0] || 0 },
+                    { label: 'Y坐标', name: 'y', value: instruction.params[1] || 0 },
+                    { label: '宽度', name: 'width', value: instruction.params[2] || 50 },
+                    { label: '高度', name: 'height', value: instruction.params[3] || 50 }
+                ]);
+                break;
+                
+            case 'rectangle':
+                html += createPropertyGroup('位置和尺寸', [
+                    { label: 'X坐标', name: 'x', value: instruction.params[0] || 0 },
+                    { label: 'Y坐标', name: 'y', value: instruction.params[1] || 0 },
+                    { label: '宽度', name: 'width', value: instruction.params[2] || 100 },
+                    { label: '高度', name: 'height', value: instruction.params[3] || 50 }
+                ]);
+                break;
+                
+            case 'line':
+                html += createPropertyGroup('起点', [
+                    { label: 'X1坐标', name: 'x1', value: instruction.params[0] || 0 },
+                    { label: 'Y1坐标', name: 'y1', value: instruction.params[1] || 0 }
+                ]);
+                
+                html += createPropertyGroup('终点', [
+                    { label: 'X2坐标', name: 'x2', value: instruction.params[2] || 50 },
+                    { label: 'Y2坐标', name: 'y2', value: instruction.params[3] || 50 }
+                ]);
+                break;
+        }
+        
+        html += '</div>';
+        propertiesContent.innerHTML = html;
+        
+        // 绑定属性控件事件
+        bindPropertyControls(instruction);
+    }
+    
+    // 创建属性组
+    function createPropertyGroup(title, properties) {
+        let html = `<div class="property-group">
+            <h5>${title}</h5>`;
+            
+        properties.forEach(prop => {
+            html += `<label>${prop.label}</label>
+            <input type="${prop.type || 'number'}" 
+                   data-property="${prop.name}" 
+                   value="${prop.value}" 
+                   ${prop.type === 'text' ? 'style="width: 100%"' : ''}>`;
+        });
+        
+        html += '</div>';
+        return html;
+    }
+    
+    // 绑定属性控件事件
+    function bindPropertyControls(instruction) {
+        const inputs = propertiesContent.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('change', () => {
+                const property = input.dataset.property;
+                const value = input.value;
+                
+                // 更新设计器中的元素
+                if (visualDesigner && visualDesigner.selectedElement) {
+                    visualDesigner.updateElementProperty(
+                        visualDesigner.selectedElement, 
+                        property, 
+                        value
+                    );
+                }
+                
+                // 更新指令输入框中的文本
+                updateInstructionInTextarea(instruction.type, property, value);
+            });
+        });
+    }
+    
+    // 更新文本区域中的指令
+    function updateInstructionInTextarea(type, property, value) {
+        // 这里应该更新文本区域中的指令，暂时留空
+        // 实际实现需要解析和重构指令文本
+    }
     
     // 更新帮助信息
     function updateHelp() {
