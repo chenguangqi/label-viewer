@@ -6,27 +6,32 @@
 // 等待DOM加载完成
 document.addEventListener('DOMContentLoaded', () => {
     // 获取DOM元素
-    const labelPreview = document.getElementById('label-preview');
     const propertiesPanel = document.getElementById('properties-panel');
     const propertiesContent = document.getElementById('properties-content');
     
-    // 初始化模块
-    const renderer = new LabelRenderer(labelPreview);
     const helpData = window.HelpData || 
                      (typeof require !== 'undefined' ? require('../models/help-data.js') : null);
     
     // 创建共享的Label实例
     const sharedLabel = new Label();
     
-    // 创建可视化设计器实例
-    const visualDesignerContainer = document.getElementById('visual-designer');
-    let visualDesigner = null;
+    // 创建标签设计器实例
+    const designerContainer = document.getElementById('visual-designer');
+    let labelDesigner = null;
     
-    if (visualDesignerContainer) {
-        visualDesigner = new VisualDesigner(visualDesignerContainer, (instruction) => {
+    if (designerContainer) {
+        labelDesigner = new LabelDesigner(designerContainer, (instruction) => {
             // 当元素被选中时更新属性面板
             onElementSelected(instruction);
         }, sharedLabel);
+    }
+    
+    // 创建预览器实例
+    const previewContainer = document.getElementById('preview-tab');
+    let previewer = null;
+    
+    if (previewContainer) {
+        previewer = new LabelPreviewer(previewContainer, sharedLabel);
     }
     
     // 同步标志，防止循环更新
@@ -54,9 +59,10 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // 特殊处理预览标签
             if (tabId === 'preview-tab') {
-                // 使用共享Label实例获取指令
-                const instructions = sharedLabel.getAllInstructions();
-                renderer.render(instructions);
+                // 触发预览渲染
+                if (previewer) {
+                    previewer.render();
+                }
             }
             
             // 特殊处理设计器标签
@@ -123,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // 同步代码模式到可视化编辑模式
+    // 同步代码模式到标签设计器
     function syncEditorToDesigner() {
         if (isSyncing) return;
         
@@ -132,25 +138,25 @@ document.addEventListener('DOMContentLoaded', () => {
             // 使用共享Label实例获取指令
             const instructions = sharedLabel.getAllInstructions();
             
-            if (visualDesigner) {
-                visualDesigner.loadInstructions(instructions);
+            if (labelDesigner) {
+                labelDesigner.loadInstructions(instructions);
             }
         } catch (e) {
-            console.error("同步代码模式到可视化编辑模式时出错:", e);
+            console.error("同步代码模式到标签设计器时出错:", e);
         } finally {
             isSyncing = false;
         }
     }
     
-    // 同步可视化编辑模式到代码模式
+    // 同步标签设计器到代码模式
     function syncDesignerToEditor() {
         if (isSyncing) return;
         
         try {
             isSyncing = true;
-            if (visualDesigner) {
+            if (labelDesigner) {
                 // 更新共享Label实例
-                const instructions = visualDesigner.getAllInstructions();
+                const instructions = labelDesigner.getAllInstructions();
                 sharedLabel.loadFromInstructions(instructions);
                 
                 // 更新代码编辑器内容
@@ -159,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         } catch (e) {
-            console.error("同步可视化编辑模式到代码模式时出错:", e);
+            console.error("同步标签设计器到代码模式时出错:", e);
         } finally {
             isSyncing = false;
         }
@@ -282,9 +288,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const value = input.value;
                 
                 // 更新设计器中的元素
-                if (visualDesigner && visualDesigner.selectedElement) {
-                    visualDesigner.updateElementProperty(
-                        visualDesigner.selectedElement, 
+                if (labelDesigner && labelDesigner.selectedElement) {
+                    labelDesigner.updateElementProperty(
+                        labelDesigner.selectedElement, 
                         property, 
                         value
                     );
