@@ -45,14 +45,14 @@ class LabelEditor {
         // 绑定Ctrl+Enter快捷键渲染
         this.textarea.addEventListener('keydown', (event) => {
             if (event.ctrlKey && event.key === 'Enter') {
-                // 触发自定义事件，通知外部切换到预览模式
+                // 触发自定义事件，通知外部切换到标签预览器
                 this.container.dispatchEvent(new CustomEvent('previewRequest'));
             }
         });
     }
     
     /**
-     * 同步代码编辑器内容到Label实例
+     * 同步标签编辑器内容到Label实例
      */
     syncToLabel() {
         if (this.isSyncing) return;
@@ -68,14 +68,14 @@ class LabelEditor {
             // 触发同步完成事件
             this.container.dispatchEvent(new CustomEvent('codeSyncComplete'));
         } catch (e) {
-            console.error("同步代码到共享Label实例时出错:", e);
+            console.error("同步标签编辑器到共享Label实例时出错:", e);
         } finally {
             this.isSyncing = false;
         }
     }
     
     /**
-     * 从Label实例同步到代码编辑器
+     * 从Label实例同步到标签编辑器
      */
     syncFromLabel() {
         if (this.isSyncing) return;
@@ -84,7 +84,7 @@ class LabelEditor {
             this.isSyncing = true;
             this.textarea.value = this.sharedLabel.toText();
         } catch (e) {
-            console.error("从共享Label实例同步到代码编辑器时出错:", e);
+            console.error("从共享Label实例同步到标签编辑器时出错:", e);
         } finally {
             this.isSyncing = false;
         }

@@ -23,7 +23,7 @@ class LabelDesigner {
         // 清空容器
         this.container.innerHTML = '';
         
-        // 创建设计器容器
+        // 创建标签设计器容器
         this.designerContainer = document.createElement('div');
         this.designerContainer.className = 'designer-container';
         this.designerContainer.style.position = 'relative';
@@ -198,7 +198,7 @@ class LabelDesigner {
         // 创建指令类实例
         const instructionInstance = InstructionParser.createInstructionInstance(instructionObj);
         
-        // 创建设计器元素
+        // 创建标签设计器元素
         let elementData;
         switch (type) {
             case 'text':
@@ -254,7 +254,7 @@ class LabelDesigner {
             // 创建指令类实例
             const instructionInstance = InstructionParser.createInstructionInstance(instructionObj);
             
-            // 更新设计器元素属性
+            // 更新标签设计器元素属性
             instructionInstance.updateDesignerElementProperty(elementData, property, value);
             
             this.updateInstruction(elementData);
@@ -319,7 +319,7 @@ class LabelDesigner {
                     break;
             }
             
-            // 创建设计器元素
+            // 创建标签设计器元素
             const elementData = instructionInstance.createDesignerElement(x, y);
             this.elements.push(elementData);
             this.canvas.appendChild(elementData.element);

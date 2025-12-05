@@ -27,87 +27,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }, sharedLabel);
     }
     
-    // 创建预览器实例
+    // 创建标签预览器实例
     const previewContainer = document.getElementById('preview-tab');
-    let previewer = null;
+    let labelPreviewer = null;
     
     if (previewContainer) {
-        previewer = new LabelPreviewer(previewContainer, sharedLabel);
+        labelPreviewer = new LabelPreviewer(previewContainer, sharedLabel);
     }
-    
-    // 同步标志，防止循环更新
-    let isSyncing = false;
-    
-    // 绑定标签页切换事件
-    const tabButtons = document.querySelectorAll('.tab-button');
-    const tabPanes = document.querySelectorAll('.tab-pane');
-    
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const tabId = button.getAttribute('data-tab');
-            
-            // 更新活动标签按钮
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            
-            // 显示对应的标签内容
-            tabPanes.forEach(pane => {
-                pane.classList.remove('active');
-                if (pane.id === tabId) {
-                    pane.classList.add('active');
-                }
-            });
-            
-            // 特殊处理预览标签
-            if (tabId === 'preview-tab') {
-                // 触发预览渲染
-                if (previewer) {
-                    previewer.render();
-                }
-            }
-            
-            // 特殊处理预览标签
-            if (tabId === 'preview-tab') {
-                // 隐藏工具箱和属性面板
-                if (toolbox) {
-                    toolbox.style.display = 'none';
-                }
-                if (propertiesPanel) {
-                    propertiesPanel.style.display = 'none';
-                }
-                
-                // 触发预览渲染
-                if (previewer) {
-                    previewer.render();
-                }
-            }
-            
-            // 特殊处理设计器标签
-            if (tabId === 'designer-tab') {
-                // 显示工具箱和属性面板
-                if (toolbox) {
-                    toolbox.style.display = 'block';
-                }
-                if (propertiesPanel) {
-                    propertiesPanel.style.display = 'block';
-                }
-                
-                // 同步代码到设计器
-                syncEditorToDesigner();
-            } 
-            
-            // 特殊处理代码编辑器标签
-            if (tabId === 'editor-tab') {
-                // 隐藏工具箱和属性面板
-                if (toolbox) {
-                    toolbox.style.display = 'none';
-                }
-                if (propertiesPanel) {
-                    propertiesPanel.style.display = 'none';
-                }
-            }
-        });
-    });
     
     // 创建标签编辑器实例
     const editorContainer = document.getElementById('editor-tab');
@@ -136,10 +62,76 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    // 同步标志，防止循环更新
+    let isSyncing = false;
+    
+    // 绑定标签页切换事件
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const tabId = button.getAttribute('data-tab');
+            
+            // 更新活动标签按钮
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            // 显示对应的标签内容
+            tabPanes.forEach(pane => {
+                pane.classList.remove('active');
+                if (pane.id === tabId) {
+                    pane.classList.add('active');
+                }
+            });
+            
+            // 特殊处理标签预览器
+            if (tabId === 'preview-tab') {
+                // 隐藏工具箱和属性面板
+                if (toolbox) {
+                    toolbox.style.display = 'none';
+                }
+                if (propertiesPanel) {
+                    propertiesPanel.style.display = 'none';
+                }
+                
+                // 触发预览渲染
+                if (labelPreviewer) {
+                    labelPreviewer.render();
+                }
+            }
+            
+            // 特殊处理标签设计器
+            if (tabId === 'designer-tab') {
+                // 显示工具箱和属性面板
+                if (toolbox) {
+                    toolbox.style.display = 'block';
+                }
+                if (propertiesPanel) {
+                    propertiesPanel.style.display = 'block';
+                }
+                
+                // 同步标签编辑器到标签设计器
+                syncEditorToDesigner();
+            } 
+            
+            // 特殊处理标签编辑器
+            if (tabId === 'editor-tab') {
+                // 隐藏工具箱和属性面板
+                if (toolbox) {
+                    toolbox.style.display = 'none';
+                }
+                if (propertiesPanel) {
+                    propertiesPanel.style.display = 'none';
+                }
+            }
+        });
+    });
+    
     // 监听代码同步完成事件
     if (editorContainer) {
         editorContainer.addEventListener('codeSyncComplete', () => {
-            // 如果当前在设计器标签页，则同步到设计器
+            // 如果当前在标签设计器标签页，则同步到标签设计器
             const activeTab = document.querySelector('.tab-button.active');
             if (activeTab && activeTab.getAttribute('data-tab') === 'designer-tab') {
                 syncEditorToDesigner();
@@ -147,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // 同步代码模式到标签设计器
+    // 同步标签编辑器到标签设计器
     function syncEditorToDesigner() {
         if (isSyncing) return;
         
@@ -160,13 +152,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 labelDesigner.loadInstructions(instructions);
             }
         } catch (e) {
-            console.error("同步代码模式到标签设计器时出错:", e);
+            console.error("同步标签编辑器到标签设计器时出错:", e);
         } finally {
             isSyncing = false;
         }
     }
     
-    // 同步标签设计器到代码模式
+    // 同步标签设计器到标签编辑器
     function syncDesignerToEditor() {
         if (isSyncing) return;
         
@@ -177,13 +169,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const instructions = labelDesigner.getAllInstructions();
                 sharedLabel.loadFromInstructions(instructions);
                 
-                // 更新代码编辑器内容
+                // 更新标签编辑器内容
                 if (labelEditor) {
                     labelEditor.syncFromLabel();
                 }
             }
         } catch (e) {
-            console.error("同步标签设计器到代码模式时出错:", e);
+            console.error("同步标签设计器到标签编辑器时出错:", e);
         } finally {
             isSyncing = false;
         }
@@ -305,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const property = input.dataset.property;
                 const value = input.value;
                 
-                // 更新设计器中的元素
+                // 更新标签设计器中的元素
                 if (labelDesigner && labelDesigner.selectedElement) {
                     labelDesigner.updateElementProperty(
                         labelDesigner.selectedElement, 
@@ -317,7 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 更新指令输入框中的文本
                 updateInstructionInTextarea(instruction.type, property, value);
                 
-                // 同步设计器到编辑器
+                // 同步标签设计器到标签编辑器
                 if (!isSyncing) {
                     syncDesignerToEditor();
                 }
@@ -331,9 +323,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // 实际实现需要解析和重构指令文本
     }
     
-    
     // 初始渲染
-    // 默认切换到预览模式以显示初始内容
+    // 默认切换到标签预览器以显示初始内容
     setTimeout(() => {
         const previewTabButton = document.querySelector('[data-tab="preview-tab"]');
         if (previewTabButton) {

@@ -82,7 +82,7 @@ header h1::after {
     display: block;
 }
 
-/* 代码模式区域样式 */
+/* 标签编辑器区域样式 */
 .editor-section {
     display: flex;
     flex-direction: column;
@@ -129,7 +129,7 @@ header h1::after {
 }
 
 
-/* 预览区域样式 */
+/* 标签预览区域样式 */
 .preview-section {
     display: flex;
     flex-direction: column;
@@ -172,7 +172,7 @@ header h1::after {
     border-color: #3498db;
 }
 
-/* 设计器区域样式 */
+/* 标签设计器区域样式 */
 .designer-section {
     display: flex;
     flex-direction: column;
