@@ -8,17 +8,15 @@ const HelpData = {
     instructions: {
         'label': {
             name: '标签整体设置指令 (label)',
-            syntax: 'label,<width>,<height>,<background>,<padding>',
+            syntax: 'label,<width>,<height>',
             description: '用于设置整个标签的基本属性',
             parameters: [
                 { name: 'width', type: 'number', required: '是', validValues: '数值 > 0', description: '标签宽度' },
-                { name: 'height', type: 'number', required: '是', validValues: '数值 > 0', description: '标签高度' },
-                { name: 'background', type: 'string', required: '是', validValues: '十六进制颜色值，如#FFFFFF', description: '标签背景色' },
-                { name: 'padding', type: 'number', required: '是', validValues: '数值 ≥ 0', description: '标签内边距' }
+                { name: 'height', type: 'number', required: '是', validValues: '数值 > 0', description: '标签高度' }
             ],
-            remark: '定义标签的整体尺寸和背景属性',
+            remark: '定义标签的整体尺寸',
             samples: [
-                'label,70,40,#F0F0F0,2'
+                'label,70,40'
             ]
         },
         'text': {

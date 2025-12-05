@@ -197,7 +197,7 @@ rectangle,0,0,70,40,0.3,#FFFF00,#000000
 
 #### 指令语法
 ```
-label,<width>,<height>,<background>,<padding>
+label,<width>,<height>
 ```
 
 #### 指令描述
@@ -208,14 +208,12 @@ label,<width>,<height>,<background>,<padding>
 |--------|------|------|--------|------|
 | width | number | 是 | 数值 > 0 | 标签宽度 |
 | height | number | 是 | 数值 > 0 | 标签高度 |
-| background | string | 是 | 十六进制颜色值，如#FFFFFF | 标签背景色 |
-| padding | number | 是 | 数值 ≥ 0 | 标签内边距 |
 
 #### 指令备注
 - 一般放在标签内容的最前面
-- 决定标签的整体尺寸和背景
+- 决定标签的整体尺寸
 
 #### 示例
 ```
-label,70,40,#F0F0F0,2
+label,70,40
 ```

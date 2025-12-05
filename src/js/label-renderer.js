@@ -24,9 +24,7 @@ class LabelRenderer {
         // 默认标签设置
         let labelSettings = {
             width: 200,
-            height: 100,
-            background: '#FFFFFF',
-            padding: 0
+            height: 100
         };
         
         // 查找标签设置指令
@@ -39,8 +37,6 @@ class LabelRenderer {
         const labelContainer = document.createElement('div');
         labelContainer.style.width = `${labelSettings.width}px`;
         labelContainer.style.height = `${labelSettings.height}px`;
-        labelContainer.style.backgroundColor = labelSettings.background;
-        labelContainer.style.padding = `${labelSettings.padding}px`;
         labelContainer.style.position = 'relative';
         labelContainer.style.border = '1px solid #ccc';
         
@@ -69,9 +65,7 @@ class LabelRenderer {
     _parseLabelSettings(params) {
         return {
             width: parseFloat(params[0]),
-            height: parseFloat(params[1]),
-            background: params[2],
-            padding: parseFloat(params[3])
+            height: parseFloat(params[1])
         };
     }
     
