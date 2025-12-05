@@ -65,7 +65,7 @@ main {
 
 #instruction-input {
     width: 100%;
-    min-height: 300px;
+    min-height: 600px;
     padding: 15px;
     border: 1px solid #ddd;
     border-radius: 5px;
@@ -126,7 +126,7 @@ button {
     background-color: white;
     border: 1px solid #ddd;
     border-radius: 5px;
-    min-height: 400px;
+    min-height: 600px;
     position: relative;
     overflow: hidden;
     display: flex;
