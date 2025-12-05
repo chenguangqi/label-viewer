@@ -23,7 +23,7 @@ class VisualDesigner {
         this.designerContainer.className = 'designer-container';
         this.designerContainer.style.position = 'relative';
         this.designerContainer.style.width = '100%';
-        this.designerContainer.style.height = '400px';
+        this.designerContainer.style.height = '100%';
         this.designerContainer.style.border = '1px solid #ccc';
         this.designerContainer.style.backgroundColor = '#f9f9f9';
         this.designerContainer.style.overflow = 'hidden';

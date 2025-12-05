@@ -51,9 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // 特殊处理可视化编辑模式标签页
             if (tabId === 'designer-tab') {
-                // 显示工具箱和属性面板
+                // 显示工具箱
                 toolbox.style.display = 'block';
-                propertiesPanel.style.display = 'block';
                 
                 // 初始化可视化设计器
                 if (!visualDesigner) {
@@ -74,7 +73,9 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 // 隐藏工具箱和属性面板
                 toolbox.style.display = 'none';
-                propertiesPanel.style.display = 'none';
+                if (propertiesPanel) {
+                    propertiesPanel.style.display = 'none';
+                }
             }
             
             // 当切换到预览模式时，自动渲染标签
@@ -178,6 +179,11 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 当元素被选中时更新属性面板
     function onElementSelected(instruction) {
+        // 显示属性面板
+        if (propertiesPanel) {
+            propertiesPanel.style.display = 'block';
+        }
+        
         if (!instruction) {
             propertiesContent.innerHTML = '<p>请选择一个元素以编辑其属性</p>';
             return;

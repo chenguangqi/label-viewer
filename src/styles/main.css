@@ -194,7 +194,8 @@ header h1::after {
     border-bottom: 2px solid #eee;
 }
 
-#visual-designer {
+.designer-wrapper {
+    position: relative;
     flex: 1;
 }
 
@@ -206,6 +207,7 @@ header h1::after {
     box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
     overflow: hidden;
     position: relative;
+    height: 100%;
 }
 
 .designer-canvas {
@@ -290,10 +292,9 @@ header h1::after {
 
 /* 属性面板样式 */
 .properties-panel {
-    position: fixed;
-    top: 50%;
+    position: absolute;
+    top: 20px;
     right: 20px;
-    transform: translateY(-50%);
     width: 300px;
     background: white;
     border-radius: 10px;
@@ -301,6 +302,8 @@ header h1::after {
     z-index: 1000;
     padding: 20px;
     display: none;
+    max-height: calc(100% - 40px);
+    overflow-y: auto;
 }
 
 .properties-panel h3 {
@@ -309,6 +312,9 @@ header h1::after {
     font-weight: 600;
     padding-bottom: 10px;
     border-bottom: 2px solid #eee;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .property-group {
