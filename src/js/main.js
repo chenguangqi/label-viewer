@@ -7,8 +7,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // 获取DOM元素
     const instructionInput = document.getElementById('instruction-input');
-    const renderButton = document.getElementById('render-btn');
-    const clearButton = document.getElementById('clear-btn');
     const labelPreview = document.getElementById('label-preview');
     const visualDesignerElement = document.getElementById('visual-designer');
     const toolbox = document.getElementById('toolbox');
@@ -75,30 +73,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 toolbox.style.display = 'none';
                 propertiesPanel.style.display = 'none';
             }
+            
+            // 当切换到预览模式时，自动渲染标签
+            if (tabId === 'preview-tab') {
+                const instructionsText = instructionInput.value;
+                const instructions = InstructionParser.parseText(instructionsText);
+                renderer.render(instructions);
+            }
         });
     });
     
-    // 绑定渲染按钮事件
-    renderButton.addEventListener('click', () => {
-        const instructionsText = instructionInput.value;
-        const instructions = InstructionParser.parseText(instructionsText);
-        renderer.render(instructions);
-        
-        // 如果当前在预览模式标签页，不需要切换
-        // 如果在其他标签页，可以考虑自动切换到预览模式页
-    });
-    
-    // 绑定清空按钮事件
-    clearButton.addEventListener('click', () => {
-        instructionInput.value = '';
-        labelPreview.innerHTML = '';
-        helpContent.innerHTML = '<p><i class="fas fa-info-circle"></i> 将光标定位到指令输入框的某一行，此处将显示该行指令的详细帮助信息。</p>';
-        instructionInput.focus();
-        
-        if (visualDesigner) {
-            visualDesigner.clear();
-        }
-    });
     
     // 绑定输入框光标位置变化事件
     instructionInput.addEventListener('keyup', () => {
@@ -126,7 +110,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // 绑定Ctrl+Enter快捷键渲染
     instructionInput.addEventListener('keydown', (event) => {
         if (event.ctrlKey && event.key === 'Enter') {
-            renderButton.click();
+            // 切换到预览模式并渲染
+            const previewTabButton = document.querySelector('[data-tab="preview-tab"]');
+            if (previewTabButton) {
+                previewTabButton.click();
+            }
         }
     });
     
@@ -360,5 +348,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // 初始渲染
-    renderButton.click();
+    // 默认切换到预览模式以显示初始内容
+    setTimeout(() => {
+        const previewTabButton = document.querySelector('[data-tab="preview-tab"]');
+        if (previewTabButton) {
+            previewTabButton.click();
+        }
+    }, 100);
 });

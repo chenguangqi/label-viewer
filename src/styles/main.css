@@ -108,9 +108,8 @@ header h1::after {
 }
 
 .input-group textarea {
-    flex: 1;
     width: 100%;
-    min-height: 350px;
+    height: 400px;
     padding: 15px;
     border: 2px solid #e1e8ed;
     border-radius: 8px;
@@ -129,72 +128,6 @@ header h1::after {
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
 }
 
-.button-group {
-    display: flex;
-    gap: 15px;
-    padding-top: 10px;
-}
-
-.button-group button {
-    padding: 12px 25px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 16px;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-#render-btn {
-    background: linear-gradient(to right, #3498db, #2980b9);
-    color: white;
-    box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
-}
-
-#render-btn:hover {
-    background: linear-gradient(to right, #2980b9, #2573a7);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
-}
-
-#render-btn:active {
-    transform: translateY(0);
-}
-
-#clear-btn {
-    background: linear-gradient(to right, #95a5a6, #7f8c8d);
-    color: white;
-    box-shadow: 0 4px 10px rgba(149, 165, 166, 0.3);
-}
-
-#clear-btn:hover {
-    background: linear-gradient(to right, #7f8c8d, #6c7a7b);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(149, 165, 166, 0.4);
-}
-
-#clear-btn:active {
-    transform: translateY(0);
-}
-
-#design-btn {
-    background: linear-gradient(to right, #2ecc71, #27ae60);
-    color: white;
-    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
-}
-
-#design-btn:hover {
-    background: linear-gradient(to right, #27ae60, #219653);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(46, 204, 113, 0.4);
-}
-
-#design-btn:active {
-    transform: translateY(0);
-}
 
 /* 预览区域样式 */
 .preview-section {
