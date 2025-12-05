@@ -3,10 +3,6 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    grid-template-rows: auto 1fr;
-    grid-gap: 20px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #f5f7fa 0%, #e4edf9 100%);
     min-height: 100vh;
@@ -14,7 +10,6 @@
 
 /* 标题样式 */
 header h1 {
-    grid-column: 1 / -1;
     text-align: center;
     color: #2c3e50;
     margin-bottom: 20px;
@@ -36,8 +31,16 @@ header h1::after {
     border-radius: 3px;
 }
 
+/* 主要内容区域 */
+.main-content {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
 /* 编辑区域样式 */
 .editor-section {
+    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -46,6 +49,7 @@ header h1::after {
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     transition: box-shadow 0.3s ease;
+    min-width: 0;
 }
 
 .editor-section:hover {
@@ -132,6 +136,23 @@ header h1::after {
 }
 
 /* 预览区域样式 */
+.preview-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: box-shadow 0.3s ease;
+    min-width: 0;
+}
+
+.preview-section:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
 .preview-section h2 {
     margin-top: 0;
     color: #2c3e50;
@@ -141,8 +162,9 @@ header h1::after {
 }
 
 #label-preview {
+    flex: 1;
     border: 2px dashed #bdc3c7;
-    min-height: 200px;
+    min-height: 300px;
     padding: 20px;
     background-color: #fff;
     border-radius: 8px;
@@ -157,9 +179,8 @@ header h1::after {
 
 /* 帮助区域样式 */
 .help-section {
-    border-left: none;
-    padding: 20px;
     background: white;
+    padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     transition: box-shadow 0.3s ease;
@@ -179,7 +200,7 @@ header h1::after {
 
 /* 添加滚动条样式 */
 .help-content {
-    max-height: calc(100vh - 150px);
+    max-height: 300px;
     overflow-y: auto;
     padding: 15px;
     border: 1px solid #eee;
@@ -274,22 +295,29 @@ header h1::after {
 }
 
 /* 响应式设计 */
-@media (max-width: 992px) {
-    main {
-        grid-template-columns: 1fr;
-    }
-}
-
 @media (max-width: 768px) {
     .container {
-        padding: 10px;
+        padding: 15px;
+    }
+    
+    header h1 {
+        font-size: 1.5em;
+    }
+    
+    .main-content {
+        flex-direction: column;
     }
     
     .button-group {
         flex-direction: column;
     }
     
-    header h1 {
-        font-size: 1.5rem;
+    .button-group button {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .help-content {
+        max-height: 200px;
     }
 }
