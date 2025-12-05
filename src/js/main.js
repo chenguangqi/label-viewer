@@ -157,13 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const instructions = visualDesigner.getAllInstructions();
                 let instructionsText = '';
                 
-                // 添加label指令（如果存在）
-                const labelMatch = instructionInput.value.match(/^label,.*$/m);
-                if (labelMatch) {
-                    instructionsText += labelMatch[0] + '\n';
-                }
-                
-                // 添加其他指令
+                // 添加所有指令
                 instructions.forEach(instruction => {
                     instructionsText += instruction.type + ',' + instruction.params.join(',') + '\n';
                 });

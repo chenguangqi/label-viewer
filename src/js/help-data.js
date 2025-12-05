@@ -1,24 +1,11 @@
 /**
- * 指令帮助数据
- * 包含所有支持的标签指令的详细定义
+ * 帮助数据模块
+ * 提供各种指令的帮助信息
  */
 
-const HelpData = {
+class HelpData {
     // 指令定义数据，来源于LABEL_INSTRUCTIONS.md
-    instructions: {
-        'label': {
-            name: '标签整体设置指令 (label)',
-            syntax: 'label,<width>,<height>',
-            description: '用于设置整个标签的基本属性',
-            parameters: [
-                { name: 'width', type: 'number', required: '是', validValues: '数值 > 0', description: '标签宽度' },
-                { name: 'height', type: 'number', required: '是', validValues: '数值 > 0', description: '标签高度' }
-            ],
-            remark: '定义标签的整体尺寸',
-            samples: [
-                'label,70,40'
-            ]
-        },
+    static instructions = {
         'text': {
             name: '文本指令 (text)',
             syntax: 'text,<x>,<y>,<width>,<height>,<font-size>,<font-family>,<font-weight>,<text-align>,<color>,<text>',
@@ -53,7 +40,7 @@ const HelpData = {
                 { name: 'display-value', type: 'boolean', required: '是', validValues: 'true,false', description: '是否显示条码值' },
                 { name: 'data', type: 'string', required: '是', validValues: '符合对应条码类型规则的字符串', description: '条形码数据' }
             ],
-            remark: '不同条码类型对数据格式有不同要求；CODE128支持ASCII全部128个字符',
+            remark: '不同条码类型对数据格式有不同要求',
             samples: [
                 'barcode,CODE128,5,15,50,10,true,1234567890128'
             ]
@@ -69,7 +56,7 @@ const HelpData = {
                 { name: 'ecc', type: 'string', required: '是', validValues: 'L,M,Q,H', description: '纠错等级' },
                 { name: 'data', type: 'string', required: '是', validValues: '任意字符串', description: '二维码数据' }
             ],
-            remark: '数据长度影响二维码密度；纠错等级越高可纠正的错误越多，但会降低数据容量',
+            remark: '纠错等级越高可纠正的错误越多，但会降低数据容量',
             samples: [
                 'qrcode,45,15,20,Q,https://example.com/product/12345'
             ]
@@ -85,7 +72,7 @@ const HelpData = {
                 { name: 'height', type: 'number', required: '是', validValues: '数值 > 0', description: '图片高度' },
                 { name: 'src', type: 'string', required: '是', validValues: '本地图片路径或Base64编码字符串', description: '图片路径或Base64编码' }
             ],
-            remark: '支持JPG、PNG、GIF等常见格式；按指定尺寸显示图片',
+            remark: '支持JPG、PNG、GIF等常见格式',
             samples: [
                 'image,5,5,15,10,logo.png'
             ]
@@ -125,18 +112,18 @@ const HelpData = {
                 'rectangle,0,0,70,40,0.3,#FFFF00,#000000'
             ]
         }
-    },
+    };
 
     /**
      * 获取指令帮助信息
-     * @param {string} instructionName - 指令名称
-     * @returns {Object|null} 指令帮助信息对象，如果找不到返回null
+     * @param {string} instructionType - 指令类型
+     * @returns {Object|null} 帮助信息对象，如果未找到返回null
      */
-    getInstructionHelp(instructionName) {
-        return this.instructions[instructionName] || null;
-    },
+    static getInstructionHelp(instructionType) {
+        return this.instructions[instructionType] || null;
+    }
 
-    /**
+     /**
      * HTML转义函数
      * @param {string} text - 需要转义的文本
      * @returns {string} 转义后的文本
@@ -153,92 +140,70 @@ const HelpData = {
         return text.replace(/[&<>"']/g, function(m) {
             return map[m];
         });
-    },
+    }
 
     /**
-     * 生成指令帮助HTML
-     * @param {Object} helpData - 指令帮助数据
+     * 生成帮助信息的HTML
+     * @param {Object} helpInfo - 帮助信息对象
      * @returns {string} HTML字符串
      */
-    generateHelpHTML(helpData) {
-        if (!helpData) {
-            return '<p>未找到相关指令的帮助信息。</p>';
+    static generateHelpHTML(helpInfo) {
+        let html = `
+        <div class="help-item">
+            <h3>${helpInfo.name}</h3>
+            <h4>指令语法</h4>
+            <p><code>${escapeHtml(helpInfo.syntax)}</code></p>
+            
+            <h4>指令描述</h4>
+            <p>${helpInfo.description}</p>
+            
+            <h4>参数说明</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>参数名</th>
+                        <th>类型</th>
+                        <th>必填</th>
+                        <th>有效值</th>
+                        <th>描述</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        for (const param of helpInfo.parameters) {
+            html += `
+                <tr>
+                    <td>${param.name}</td>
+                    <td>${param.type}</td>
+                    <td>${param.required}</td>
+                    <td>${param.validValues}</td>
+                    <td>${param.description}</td>
+                </tr>
+            `;
         }
 
-        let html = `
-            <div class="help-item">
-                <h3>${helpData.name}</h3>
-                <div class="help-section">
-                    <h4>语法</h4>
-                    <p><code>${this.escapeHtml(helpData.syntax)}</code></p>
-                </div>
-                <div class="help-section">
-                    <h4>描述</h4>
-                    <p>${helpData.description}</p>
-                </div>
-        `;
-
-        // 参数表格
         html += `
-                <div class="help-section">
-                    <h4>参数</h4>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>参数名</th>
-                                <th>类型</th>
-                                <th>必填</th>
-                                <th>有效值</th>
-                                <th>描述</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                </tbody>
+            </table>
+            
+            <h4>备注</h4>
+            <p>${helpInfo.remark}</p>
+            
+            <h4>示例</h4>
         `;
 
-        helpData.parameters.forEach(param => {
-            html += `
-                            <tr>
-                                <td>${param.name}</td>
-                                <td>${param.type}</td>
-                                <td>${param.required}</td>
-                                <td>${param.validValues}</td>
-                                <td>${param.description}</td>
-                            </tr>
-            `;
-        });
-
-        html += `
-                        </tbody>
-                    </table>
-                </div>
-        `;
-
-        // 备注
-        html += `
-                <div class="help-section">
-                    <h4>备注</h4>
-                    <p>${helpData.remark}</p>
-                </div>
-        `;
-
-        // 示例
-        html += `
-                <div class="help-section">
-                    <h4>示例</h4>
-        `;
-
-        helpData.samples.forEach(sample => {
+        for (const sample of helpInfo.samples) {
             html += `<p><code>${sample}</code></p>`;
-        });
+        }
 
         html += `
-                </div>
-            </div>
+        </div>
         `;
 
         return html;
     }
-};
+}
 
 // 确保在浏览器环境中将HelpData附加到window对象
 if (typeof window !== 'undefined') {

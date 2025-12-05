@@ -27,12 +27,6 @@ class LabelRenderer {
             height: 100
         };
         
-        // 查找标签设置指令
-        const labelInstruction = instructions.find(inst => inst.type === 'label');
-        if (labelInstruction) {
-            labelSettings = this._parseLabelSettings(labelInstruction.params);
-        }
-        
         // 创建标签容器
         const labelContainer = document.createElement('div');
         labelContainer.style.width = `${labelSettings.width}px`;
@@ -44,29 +38,12 @@ class LabelRenderer {
         
         // 渲染各个元素
         for (const instruction of instructions) {
-            if (instruction.type === 'label') {
-                // 标签设置已经处理过了
-                continue;
-            }
-            
             try {
                 this._renderElement(labelContainer, instruction);
             } catch (error) {
                 console.error(`渲染指令失败: ${instruction.type}`, error);
             }
         }
-    }
-    
-    /**
-     * 解析标签设置
-     * @param {Array} params - 参数数组
-     * @returns {Object} 标签设置对象
-     */
-    _parseLabelSettings(params) {
-        return {
-            width: parseFloat(params[0]),
-            height: parseFloat(params[1])
-        };
     }
     
     /**
@@ -95,7 +72,7 @@ class LabelRenderer {
                 this._renderRectangle(container, instruction.params);
                 break;
             default:
-                console.warn(`未知指令类型: ${instruction.type}`);
+                console.warn(`未知的指令类型: ${instruction.type}`);
         }
     }
     
@@ -105,37 +82,23 @@ class LabelRenderer {
      * @param {Array} params - 参数数组
      */
     _renderText(container, params) {
-        // text,<x>,<y>,<width>,<height>,<font-size>,<font-family>,<font-weight>,<text-align>,<color>,<text>
         const element = document.createElement('div');
-        
-        const x = parseFloat(params[0]) || 0;
-        const y = parseFloat(params[1]) || 0;
-        const width = parseFloat(params[2]) || undefined;
-        const height = parseFloat(params[3]) || undefined;
-        const fontSize = parseFloat(params[4]) || 12;
-        const fontFamily = params[5] || 'Arial';
-        const fontWeight = params[6] || 'normal';
-        const textAlign = params[7] || 'left';
-        const color = params[8] || '#000000';
-        const text = params[9] || '';
-        
-        element.textContent = text;
         element.style.position = 'absolute';
-        element.style.left = `${x}px`;
-        element.style.top = `${y}px`;
-        element.style.fontSize = `${fontSize}px`;
-        element.style.fontFamily = fontFamily;
-        element.style.fontWeight = fontWeight;
-        element.style.color = color;
-        element.style.textAlign = textAlign;
-        
-        if (width) {
-            element.style.width = `${width}px`;
-        }
-        
-        if (height) {
-            element.style.height = `${height}px`;
-        }
+        element.style.left = `${parseFloat(params[0])}px`;
+        element.style.top = `${parseFloat(params[1])}px`;
+        element.style.width = `${parseFloat(params[2])}px`;
+        element.style.height = `${parseFloat(params[3])}px`;
+        element.style.fontSize = `${parseFloat(params[4])}pt`;
+        element.style.fontFamily = params[5];
+        element.style.fontWeight = params[6];
+        element.style.textAlign = params[7];
+        element.style.color = params[8];
+        element.style.display = 'flex';
+        element.style.alignItems = 'center';
+        element.style.justifyContent = params[7]; // center, flex-start(left), flex-end(right)
+        element.textContent = params[9] || '';
+        element.style.wordWrap = 'break-word';
+        element.style.overflow = 'hidden';
         
         container.appendChild(element);
     }
@@ -146,28 +109,33 @@ class LabelRenderer {
      * @param {Array} params - 参数数组
      */
     _renderBarcode(container, params) {
-        // barcode,<type>,<x>,<y>,<width>,<height>,<display-value>,<data>
         const element = document.createElement('div');
-        
-        const type = params[0];
-        const x = parseFloat(params[1]);
-        const y = parseFloat(params[2]);
-        const width = parseFloat(params[3]);
-        const height = parseFloat(params[4]);
-        const displayValue = params[5] === 'true';
-        const data = params[6];
-        
-        element.textContent = displayValue ? data : '';
         element.style.position = 'absolute';
-        element.style.left = `${x}px`;
-        element.style.top = `${y}px`;
-        element.style.width = `${width}px`;
-        element.style.height = `${height}px`;
+        element.style.left = `${parseFloat(params[1])}px`;
+        element.style.top = `${parseFloat(params[2])}px`;
+        element.style.width = `${parseFloat(params[3])}px`;
+        element.style.height = `${parseFloat(params[4])}px`;
         element.style.border = '1px solid #000';
         element.style.display = 'flex';
+        element.style.flexDirection = 'column';
         element.style.alignItems = 'center';
         element.style.justifyContent = 'center';
+        element.style.backgroundColor = '#fff';
         element.style.fontSize = '10px';
+        
+        const barcodePattern = document.createElement('div');
+        barcodePattern.style.width = '90%';
+        barcodePattern.style.height = params[5] === 'true' ? '70%' : '100%';
+        barcodePattern.style.background = 'repeating-linear-gradient(90deg, #000, #000 2px, #fff 2px, #fff 4px)';
+        
+        element.appendChild(barcodePattern);
+        
+        if (params[5] === 'true') {
+            const value = document.createElement('div');
+            value.textContent = params[6];
+            value.style.marginTop = '4px';
+            element.appendChild(value);
+        }
         
         container.appendChild(element);
     }
@@ -178,26 +146,19 @@ class LabelRenderer {
      * @param {Array} params - 参数数组
      */
     _renderQRCode(container, params) {
-        // qrcode,<x>,<y>,<size>,<ecc>,<data>
         const element = document.createElement('div');
-        
-        const x = parseFloat(params[0]);
-        const y = parseFloat(params[1]);
-        const size = parseFloat(params[2]);
-        const ecc = params[3];
-        const data = params[4];
-        
-        element.textContent = '[QR]';
         element.style.position = 'absolute';
-        element.style.left = `${x}px`;
-        element.style.top = `${y}px`;
-        element.style.width = `${size}px`;
-        element.style.height = `${size}px`;
+        element.style.left = `${parseFloat(params[0])}px`;
+        element.style.top = `${parseFloat(params[1])}px`;
+        element.style.width = `${parseFloat(params[2])}px`;
+        element.style.height = `${parseFloat(params[2])}px`; // 正方形
         element.style.border = '1px solid #000';
         element.style.display = 'flex';
         element.style.alignItems = 'center';
         element.style.justifyContent = 'center';
+        element.style.backgroundColor = '#fff';
         element.style.fontSize = '10px';
+        element.textContent = '[QR]';
         
         container.appendChild(element);
     }
@@ -208,26 +169,19 @@ class LabelRenderer {
      * @param {Array} params - 参数数组
      */
     _renderImage(container, params) {
-        // image,<x>,<y>,<width>,<height>,<src>
         const element = document.createElement('div');
-        
-        const x = parseFloat(params[0]);
-        const y = parseFloat(params[1]);
-        const width = parseFloat(params[2]);
-        const height = parseFloat(params[3]);
-        const src = params[4];
-        
-        element.textContent = '[IMG]';
         element.style.position = 'absolute';
-        element.style.left = `${x}px`;
-        element.style.top = `${y}px`;
-        element.style.width = `${width}px`;
-        element.style.height = `${height}px`;
+        element.style.left = `${parseFloat(params[0])}px`;
+        element.style.top = `${parseFloat(params[1])}px`;
+        element.style.width = `${parseFloat(params[2])}px`;
+        element.style.height = `${parseFloat(params[3])}px`;
         element.style.border = '1px dashed #999';
         element.style.display = 'flex';
         element.style.alignItems = 'center';
         element.style.justifyContent = 'center';
+        element.style.backgroundColor = '#eee';
         element.style.fontSize = '10px';
+        element.textContent = '[IMG]';
         
         container.appendChild(element);
     }
@@ -238,28 +192,25 @@ class LabelRenderer {
      * @param {Array} params - 参数数组
      */
     _renderLine(container, params) {
-        // line,<x1>,<y1>,<x2>,<y2>,<stroke>,<color>
         const element = document.createElement('div');
+        element.style.position = 'absolute';
+        element.style.left = `${parseFloat(params[0])}px`;
+        element.style.top = `${parseFloat(params[1])}px`;
+        element.style.width = `${Math.abs(parseFloat(params[2]) - parseFloat(params[0]))}px`;
+        element.style.height = `${parseFloat(params[4])}px`;
+        element.style.backgroundColor = params[5] || '#000';
         
+        // 计算旋转角度
         const x1 = parseFloat(params[0]);
         const y1 = parseFloat(params[1]);
         const x2 = parseFloat(params[2]);
         const y2 = parseFloat(params[3]);
-        const stroke = parseFloat(params[4]);
-        const color = params[5];
         
-        // 计算线段长度和角度
-        const length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-        const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
-        
-        element.style.position = 'absolute';
-        element.style.left = `${x1}px`;
-        element.style.top = `${y1}px`;
-        element.style.width = `${length}px`;
-        element.style.height = `${stroke}px`;
-        element.style.backgroundColor = color;
-        element.style.transformOrigin = 'left center';
-        element.style.transform = `rotate(${angle}deg)`;
+        if (x1 !== x2 || y1 !== y2) {
+            const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+            element.style.transform = `rotate(${angle}deg)`;
+            element.style.transformOrigin = 'left center';
+        }
         
         container.appendChild(element);
     }
@@ -270,24 +221,14 @@ class LabelRenderer {
      * @param {Array} params - 参数数组
      */
     _renderRectangle(container, params) {
-        // rectangle,<x>,<y>,<width>,<height>,<stroke>,<fill>,<color>
         const element = document.createElement('div');
-        
-        const x = parseFloat(params[0]);
-        const y = parseFloat(params[1]);
-        const width = parseFloat(params[2]);
-        const height = parseFloat(params[3]);
-        const strokeWidth = parseFloat(params[4]);
-        const fillColor = params[5];
-        const strokeColor = params[6];
-        
         element.style.position = 'absolute';
-        element.style.left = `${x}px`;
-        element.style.top = `${y}px`;
-        element.style.width = `${width}px`;
-        element.style.height = `${height}px`;
-        element.style.backgroundColor = fillColor;
-        element.style.border = `${strokeWidth}px solid ${strokeColor}`;
+        element.style.left = `${parseFloat(params[0])}px`;
+        element.style.top = `${parseFloat(params[1])}px`;
+        element.style.width = `${parseFloat(params[2])}px`;
+        element.style.height = `${parseFloat(params[3])}px`;
+        element.style.border = `${parseFloat(params[4])}px solid ${params[6]}`;
+        element.style.backgroundColor = params[5];
         
         container.appendChild(element);
     }

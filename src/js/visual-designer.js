@@ -435,9 +435,7 @@ class VisualDesigner {
         this.clear();
         
         for (const instruction of instructions) {
-            if (instruction.type !== 'label') {
-                this.createElement(instruction.type, instruction.params);
-            }
+            this.createElement(instruction.type, instruction.params);
         }
         
         // 加载到Label实例中

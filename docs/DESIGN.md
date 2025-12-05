@@ -37,7 +37,6 @@
 
 ### 基础语法
 ```
-label,&lt;width&gt;,&lt;height&gt;
 text,&lt;x&gt;,&lt;y&gt;,&lt;width&gt;,&lt;height&gt;,&lt;font-size&gt;,&lt;font-family&gt;,&lt;font-weight&gt;,&lt;text-align&gt;,&lt;color&gt;,&lt;text&gt;
 barcode,&lt;type&gt;,&lt;x&gt;,&lt;y&gt;,&lt;width&gt;,&lt;height&gt;,&lt;display-value&gt;,&lt;data&gt;
 qrcode,&lt;x&gt;,&lt;y&gt;,&lt;size&gt;,&lt;ecc&gt;,&lt;data&gt;
@@ -57,7 +56,6 @@ rectangle,&lt;x&gt;,&lt;y&gt;,&lt;width&gt;,&lt;height&gt;,&lt;stroke&gt;,&lt;fi
 ### 示例用法
 ```
 # 这是一个商品标签示例
-label,70,40
 text,10,5,40,8,12,Arial,bold,center,#000000,产品名称
 barcode,CODE128,5,15,50,10,true,1234567890128
 qrcode,45,15,20,Q,https://example.com/product/12345
