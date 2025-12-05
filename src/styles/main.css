@@ -249,14 +249,17 @@ header h1::after {
 
 .designer-toolbox .toolbox-item {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    flex-direction: row; /* 水平排列 */
+    align-items: center; /* 垂直居中 */
+    justify-content: center; /* 水平居中 */
     padding: 10px;
     background: #f8f9fa;
     border-radius: 6px;
     cursor: grab;
     transition: all 0.2s ease;
     border: 1px solid #e9ecef;
+    gap: 8px; /* 添加图标和文字之间的间距 */
+    text-align: center; /* 文本居中 */
 }
 
 .designer-toolbox .toolbox-item:hover {
@@ -271,13 +274,15 @@ header h1::after {
 
 .designer-toolbox .toolbox-item i {
     font-size: 20px;
-    margin-bottom: 5px;
     color: #3498db;
+    min-width: 20px; /* 确保图标有足够的空间 */
 }
 
 .designer-toolbox .toolbox-item span {
     font-size: 14px;
     color: #495057;
+    white-space: nowrap; /* 防止文字换行 */
+    flex: 1; /* 让文本占据可用空间 */
 }
 
 /* 属性面板样式（设计器内部） */
@@ -386,7 +391,6 @@ header h1::after {
 
 .toolbox-item i {
     font-size: 20px;
-    margin-bottom: 5px;
     color: #3498db;
 }
 
@@ -502,7 +506,6 @@ header h1::after {
 
 .toolbox-item i {
     font-size: 20px;
-    margin-bottom: 5px;
     color: #3498db;
 }
 
@@ -566,7 +569,6 @@ header h1::after {
 
 .toolbox-item i {
     font-size: 20px;
-    margin-bottom: 5px;
     color: #3498db;
 }
 
