@@ -71,28 +71,36 @@ header h1::after {
 /* 标签页内容样式 */
 .tab-content {
     position: relative;
-    min-height: 500px;
+    flex: 1;
+    min-height: 0;
 }
 
 .tab-pane {
     display: none;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .tab-pane.active {
     display: block;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* 标签编辑器区域样式 */
 .editor-section {
     display: flex;
-    flex-direction: column;
-    gap: 15px;
     background: white;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     transition: box-shadow 0.3s ease;
     min-width: 0;
+    height: 500px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .editor-section:hover {
@@ -107,14 +115,22 @@ header h1::after {
     font-size: 1.1em;
 }
 
+.input-group {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+}
+
 .input-group textarea {
     width: 100%;
-    height: 400px;
+    flex: 1; /* 占据剩余空间 */
     padding: 15px;
     border: 2px solid #e1e8ed;
     border-radius: 8px;
     font-family: 'Courier New', monospace;
-    resize: vertical;
+    resize: none; /* 禁止手动调整大小 */
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
     background-color: #fdfdfd;
     font-size: 14px;
@@ -140,7 +156,8 @@ header h1::after {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     transition: box-shadow 0.3s ease;
     min-width: 0;
-    height: 500px;
+    flex: 1;
+    min-height: 0;
 }
 
 .preview-section:hover {
@@ -165,7 +182,7 @@ header h1::after {
     overflow: auto;
     transition: border-color 0.3s ease;
     box-sizing: border-box;
-    min-height: 250px; /* 设置最小高度 */
+    min-height: 0;
 }
 
 #label-preview:hover {
@@ -183,7 +200,8 @@ header h1::after {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     transition: box-shadow 0.3s ease;
     min-width: 0;
-    height: 500px;
+    flex: 1;
+    min-height: 0;
 }
 
 .designer-header h2 {
