@@ -23,28 +23,46 @@ class LabelDesigner {
         // 清空容器
         this.container.innerHTML = '';
         
+        // 创建元素
+        this.createElements();
+        
+        // 设置样式
+        this.setupStyles();
+        
+        // 绑定事件
+        this.bindEvents();
+    }
+    
+    createElements() {
         // 创建标签设计器容器
         this.designerContainer = document.createElement('div');
         this.designerContainer.className = 'designer-container';
-        this.designerContainer.style.position = 'relative';
-        this.designerContainer.style.width = '100%';
-        this.designerContainer.style.height = '100%';
-        this.designerContainer.style.border = '1px solid #ccc';
-        this.designerContainer.style.backgroundColor = '#f9f9f9';
-        this.designerContainer.style.overflow = 'hidden';
         
         // 创建标签画布
         this.canvas = document.createElement('div');
         this.canvas.className = 'designer-canvas';
-        this.canvas.style.position = 'relative';
-        this.canvas.style.width = '100%';
-        this.canvas.style.height = '100%';
         
         this.designerContainer.appendChild(this.canvas);
         this.container.appendChild(this.designerContainer);
+    }
+    
+    setupStyles() {
+        // 设置设计器容器样式
+        Object.assign(this.designerContainer.style, {
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+            border: '1px solid #ccc',
+            backgroundColor: '#f9f9f9',
+            overflow: 'hidden'
+        });
         
-        // 绑定事件
-        this.bindEvents();
+        // 设置画布样式
+        Object.assign(this.canvas.style, {
+            position: 'relative',
+            width: '100%',
+            height: '100%'
+        });
     }
     
     bindEvents() {
