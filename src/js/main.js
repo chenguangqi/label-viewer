@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const labelPreview = document.getElementById('label-preview');
     const designerSection = document.getElementById('designer-section');
     const visualDesignerElement = document.getElementById('visual-designer');
+    const toolbox = document.getElementById('toolbox');
     const propertiesPanel = document.getElementById('properties-panel');
     const propertiesContent = document.getElementById('properties-content');
     const helpContent = document.getElementById('current-instruction-help');
@@ -72,6 +73,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
+    // 绑定工具箱项目的拖拽事件
+    const toolboxItems = document.querySelectorAll('.toolbox-item');
+    toolboxItems.forEach(item => {
+        item.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', item.dataset.type);
+        });
+    });
+    
     // 切换设计模式
     function toggleDesignMode() {
         isDesignMode = !isDesignMode;
@@ -80,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // 显示设计器区域
             labelPreview.style.display = 'none';
             designerSection.style.display = 'flex';
+            toolbox.style.display = 'block';
             propertiesPanel.style.display = 'block';
             designButton.innerHTML = '<i class="fas fa-code"></i> 返回代码';
             
@@ -96,6 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // 显示预览区域
             labelPreview.style.display = 'block';
             designerSection.style.display = 'none';
+            toolbox.style.display = 'none';
             propertiesPanel.style.display = 'none';
             designButton.innerHTML = '<i class="fas fa-paint-brush"></i> 可视化设计';
         }

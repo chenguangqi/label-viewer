@@ -240,6 +240,68 @@ header h1::after {
 }
 
 /* 帮助区域样式 */
+/* 工具箱样式 */
+.toolbox {
+    position: fixed;
+    top: 50%;
+    left: 20px;
+    transform: translateY(-50%);
+    width: 150px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    padding: 20px;
+}
+
+.toolbox h3 {
+    margin-top: 0;
+    color: #2c3e50;
+    font-weight: 600;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #eee;
+    text-align: center;
+}
+
+.toolbox-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toolbox-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    cursor: grab;
+    transition: all 0.2s ease;
+    border: 1px solid #e9ecef;
+}
+
+.toolbox-item:hover {
+    background: #e9ecef;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.toolbox-item:active {
+    cursor: grabbing;
+}
+
+.toolbox-item i {
+    font-size: 20px;
+    margin-bottom: 5px;
+    color: #3498db;
+}
+
+.toolbox-item span {
+    font-size: 14px;
+    color: #495057;
+}
+
 /* 属性面板样式 */
 .properties-panel {
     position: fixed;

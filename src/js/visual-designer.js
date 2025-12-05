@@ -62,6 +62,19 @@ class VisualDesigner {
         document.addEventListener('mouseup', () => {
             this.stopDrag();
         });
+        
+        // 拖拽放置事件
+        this.canvas.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+        
+        this.canvas.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const type = e.dataTransfer.getData('text/plain');
+            if (type) {
+                this.addElementFromToolbox(type, e.clientX, e.clientY);
+            }
+        });
     }
     
     selectElement(element) {
@@ -120,6 +133,39 @@ class VisualDesigner {
     
     stopDrag() {
         this.isDragging = false;
+    }
+    
+    addElementFromToolbox(type, clientX, clientY) {
+        const containerRect = this.canvas.getBoundingClientRect();
+        const x = clientX - containerRect.left;
+        const y = clientY - containerRect.top;
+        
+        // 根据类型创建默认参数
+        let params = [];
+        switch (type) {
+            case 'text':
+                params = [x, y, 100, 30, 12, 'Arial', 'normal', 'left', '#000000', '文本'];
+                break;
+            case 'barcode':
+                params = ['CODE128', x, y, 100, 30, 'true', '1234567890128'];
+                break;
+            case 'qrcode':
+                params = [x, y, 50, 'Q', 'https://example.com'];
+                break;
+            case 'image':
+                params = [x, y, 50, 50, 'image.png'];
+                break;
+            case 'line':
+                params = [x, y, x + 50, y, 1, '#000000'];
+                break;
+            case 'rectangle':
+                params = [x, y, 100, 50, 1, 'transparent', '#000000'];
+                break;
+        }
+        
+        // 创建元素
+        const elementData = this.createElement(type, params);
+        return elementData;
     }
     
     createElement(type, params) {
@@ -374,6 +420,13 @@ class VisualDesigner {
                 this.createElement(instruction.type, instruction.params);
             }
         }
+    }
+    
+    getAllInstructions() {
+        return this.elements.map(elementData => ({
+            type: elementData.type,
+            params: elementData.params
+        }));
     }
 }
 
