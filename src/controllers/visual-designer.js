@@ -4,7 +4,7 @@
  */
 
 class VisualDesigner {
-    constructor(container, onInstructionChange) {
+    constructor(container, onInstructionChange, labelInstance) {
         this.container = container;
         this.onInstructionChange = onInstructionChange;
         this.onUpdate = null; // 添加更新回调
@@ -12,7 +12,9 @@ class VisualDesigner {
         this.elements = [];
         this.isDragging = false;
         this.dragOffset = { x: 0, y: 0 };
-        this.label = new Label(); // 使用Label类管理指令
+        
+        // 使用传入的Label实例或者创建一个新的实例
+        this.label = labelInstance || new Label();
         
         this.init();
     }

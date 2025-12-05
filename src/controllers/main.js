@@ -6,9 +6,7 @@
 // 等待DOM加载完成
 document.addEventListener('DOMContentLoaded', () => {
     // 获取DOM元素
-    const instructionInput = document.getElementById('instruction-input');
     const labelPreview = document.getElementById('label-preview');
-    const helpContent = document.getElementById('current-instruction-help');
     const propertiesPanel = document.getElementById('properties-panel');
     const propertiesContent = document.getElementById('properties-content');
     
@@ -16,6 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderer = new LabelRenderer(labelPreview);
     const helpData = window.HelpData || 
                      (typeof require !== 'undefined' ? require('../models/help-data.js') : null);
+    
+    // 创建共享的Label实例
+    const sharedLabel = new Label();
     
     // 创建可视化设计器实例
     const visualDesignerContainer = document.getElementById('visual-designer');
@@ -25,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
         visualDesigner = new VisualDesigner(visualDesignerContainer, (instruction) => {
             // 当元素被选中时更新属性面板
             onElementSelected(instruction);
-        });
+        }, sharedLabel);
     }
     
     // 同步标志，防止循环更新
@@ -53,8 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // 特殊处理预览标签
             if (tabId === 'preview-tab') {
-                const instructionsText = instructionInput.value;
-                const instructions = InstructionParser.parseText(instructionsText);
+                // 使用共享Label实例获取指令
+                const instructions = sharedLabel.getAllInstructions();
                 renderer.render(instructions);
             }
             
@@ -76,25 +77,51 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     
-    // 绑定输入框光标位置变化事件
-    instructionInput.addEventListener('keyup', () => {
-        updateHelp();
-    });
+    // 创建代码编辑器实例
+    const editorContainer = document.getElementById('editor-tab');
+    let codeEditor = null;
     
-    instructionInput.addEventListener('click', () => {
-        updateHelp();
-    });
-    
-    // 绑定Ctrl+Enter快捷键渲染
-    instructionInput.addEventListener('keydown', (event) => {
-        if (event.ctrlKey && event.key === 'Enter') {
-            // 切换到预览模式
+    if (editorContainer) {
+        codeEditor = new LabelCodeEditor(editorContainer, sharedLabel, (defaultHelp, instruction) => {
+            const helpContent = document.getElementById('current-instruction-help');
+            if (defaultHelp) {
+                helpContent.innerHTML = defaultHelp;
+                return;
+            }
+            
+            if (!instruction) {
+                helpContent.innerHTML = '<p>请选择一个元素以编辑其属性</p>';
+                return;
+            }
+            
+            const helpInfo = helpData.getInstructionHelp(instruction.type);
+            if (!helpInfo) {
+                helpContent.innerHTML = '<p>未找到该元素的帮助信息</p>';
+                return;
+            }
+            
+            helpContent.innerHTML = helpData.generateHelpHTML(helpInfo);
+        });
+        
+        // 监听预览请求事件
+        editorContainer.addEventListener('previewRequest', () => {
             const previewTabButton = document.querySelector('[data-tab="preview-tab"]');
             if (previewTabButton) {
                 previewTabButton.click();
             }
-        }
-    });
+        });
+    }
+    
+    // 监听代码同步完成事件
+    if (editorContainer) {
+        editorContainer.addEventListener('codeSyncComplete', () => {
+            // 如果当前在设计器标签页，则同步到设计器
+            const activeTab = document.querySelector('.tab-button.active');
+            if (activeTab && activeTab.getAttribute('data-tab') === 'designer-tab') {
+                syncEditorToDesigner();
+            }
+        });
+    }
     
     // 同步代码模式到可视化编辑模式
     function syncEditorToDesigner() {
@@ -102,8 +129,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         try {
             isSyncing = true;
-            const instructionsText = instructionInput.value;
-            const instructions = InstructionParser.parseText(instructionsText);
+            // 使用共享Label实例获取指令
+            const instructions = sharedLabel.getAllInstructions();
             
             if (visualDesigner) {
                 visualDesigner.loadInstructions(instructions);
@@ -122,15 +149,14 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             isSyncing = true;
             if (visualDesigner) {
+                // 更新共享Label实例
                 const instructions = visualDesigner.getAllInstructions();
-                let instructionsText = '';
+                sharedLabel.loadFromInstructions(instructions);
                 
-                // 添加所有指令
-                instructions.forEach(instruction => {
-                    instructionsText += instruction.type + ',' + instruction.params.join(',') + '\n';
-                });
-                
-                instructionInput.value = instructionsText.trim();
+                // 更新代码编辑器内容
+                if (codeEditor) {
+                    codeEditor.syncFromLabel();
+                }
             }
         } catch (e) {
             console.error("同步可视化编辑模式到代码模式时出错:", e);
@@ -281,41 +307,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // 实际实现需要解析和重构指令文本
     }
     
-    // 更新帮助信息
-    function updateHelp() {
-        const cursorPosition = instructionInput.selectionStart;
-        const text = instructionInput.value;
-        const lines = text.substring(0, cursorPosition).split('\n');
-        const currentLineIndex = lines.length - 1;
-        const currentLine = text.split('\n')[currentLineIndex];
-        
-        // 如果当前行为空或注释，显示默认提示
-        if (!currentLine || currentLine.trim() === '' || currentLine.trim().startsWith('#')) {
-            helpContent.innerHTML = '<p><i class="fas fa-info-circle"></i> 将光标定位到指令输入框的某一行，此处将显示该行指令的详细帮助信息。</p>';
-            return;
-        }
-        
-        // 解析当前行的指令
-        const instruction = InstructionParser.parse(currentLine);
-        if (!instruction) {
-            helpContent.innerHTML = '<p><i class="fas fa-exclamation-triangle"></i> 无法识别的指令格式。请检查指令语法是否正确。</p>';
-            return;
-        }
-        
-        // 检查helpData是否存在
-        if (!helpData) {
-            helpContent.innerHTML = '<p><i class="fas fa-exclamation-circle"></i> 帮助数据未加载。</p>';
-            return;
-        }
-        
-        // 获取并显示帮助信息
-        const helpInfo = helpData.getInstructionHelp(instruction.type);
-        if (helpInfo) {
-            helpContent.innerHTML = helpData.generateHelpHTML(helpInfo);
-        } else {
-            helpContent.innerHTML = '<p><i class="fas fa-question-circle"></i> 未找到相关指令的帮助信息。</p>';
-        }
-    }
     
     // 初始渲染
     // 默认切换到预览模式以显示初始内容
@@ -325,4 +316,5 @@ document.addEventListener('DOMContentLoaded', () => {
             previewTabButton.click();
         }
     }, 100);
+});
 });
