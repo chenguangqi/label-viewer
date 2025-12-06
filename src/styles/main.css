@@ -345,6 +345,13 @@ header h1::after {
     background-position: 0 0;
 }
 
+/* 可拖拽元素样式 */
+.draggable-element {
+    position: absolute;
+    cursor: move;
+    user-select: none;
+}
+
 /* 属性面板样式（设计器内部） */
 .designer-properties-panel {
     width: 300px;

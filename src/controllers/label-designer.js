@@ -11,7 +11,11 @@ class LabelDesigner {
         this.selectedElement = null;
         this.elements = [];
         this.isDragging = false;
+        this.isResizing = false;
         this.dragOffset = { x: 0, y: 0 };
+        this.resizeDirection = null;
+        this.resizeStartSize = { width: 0, height: 0 };
+        this.resizeStartPos = { x: 0, y: 0 };
         
         // 使用传入的Label实例或者创建一个新的实例
         this.label = labelInstance || new Label();
@@ -70,7 +74,23 @@ class LabelDesigner {
         this.canvas.addEventListener('mousedown', (e) => {
             if (e.target.classList.contains('draggable-element')) {
                 this.selectElement(e.target);
-                this.startDrag(e);
+                
+                // 检查是否在元素边缘（调整大小区域）
+                const rect = e.target.getBoundingClientRect();
+                const edgeThreshold = 8;
+                
+                const onRightEdge = e.clientX >= rect.right - edgeThreshold;
+                const onBottomEdge = e.clientY >= rect.bottom - edgeThreshold;
+                
+                if (onRightEdge && onBottomEdge) {
+                    this.startResizing(e, 'both'); // 同时调整宽高
+                } else if (onRightEdge) {
+                    this.startResizing(e, 'width'); // 只调整宽度
+                } else if (onBottomEdge) {
+                    this.startResizing(e, 'height'); // 只调整高度
+                } else {
+                    this.startDrag(e);
+                }
             } else {
                 this.deselectElement();
             }
@@ -80,12 +100,34 @@ class LabelDesigner {
         document.addEventListener('mousemove', (e) => {
             if (this.isDragging && this.selectedElement) {
                 this.dragElement(e);
+            } else if (this.isResizing && this.selectedElement) {
+                this.resizeElement(e);
+            }
+            
+            // 显示调整大小的光标
+            if (this.selectedElement && !this.isDragging && !this.isResizing) {
+                const rect = this.selectedElement.getBoundingClientRect();
+                const edgeThreshold = 8;
+                
+                const onRightEdge = e.clientX >= rect.right - edgeThreshold;
+                const onBottomEdge = e.clientY >= rect.bottom - edgeThreshold;
+                
+                if (onRightEdge && onBottomEdge) {
+                    this.selectedElement.style.cursor = 'nwse-resize';
+                } else if (onRightEdge) {
+                    this.selectedElement.style.cursor = 'ew-resize';
+                } else if (onBottomEdge) {
+                    this.selectedElement.style.cursor = 'ns-resize';
+                } else {
+                    this.selectedElement.style.cursor = 'move';
+                }
             }
         });
         
         // 鼠标释放事件
         document.addEventListener('mouseup', () => {
             this.stopDrag();
+            this.stopResizing();
         });
         
         // 拖拽放置事件
@@ -139,11 +181,27 @@ class LabelDesigner {
     
     startDrag(e) {
         this.isDragging = true;
+        this.isResizing = false; // 确保不是在调整大小
         const rect = this.selectedElement.getBoundingClientRect();
         const containerRect = this.canvas.getBoundingClientRect();
         
         this.dragOffset.x = e.clientX - rect.left;
         this.dragOffset.y = e.clientY - rect.top;
+    }
+    
+    startResizing(e, direction) {
+        this.isResizing = true;
+        this.isDragging = false; // 确保不是在拖拽
+        this.resizeDirection = direction;
+        
+        const rect = this.selectedElement.getBoundingClientRect();
+        this.resizeStartSize.width = rect.width;
+        this.resizeStartSize.height = rect.height;
+        this.resizeStartPos.x = e.clientX;
+        this.resizeStartPos.y = e.clientY;
+        
+        e.preventDefault();
+        e.stopPropagation();
     }
     
     dragElement(e) {
@@ -173,6 +231,54 @@ class LabelDesigner {
         }
     }
     
+    resizeElement(e) {
+        if (!this.selectedElement) return;
+        
+        const elementData = this.elements.find(el => el.element === this.selectedElement);
+        if (!elementData) return;
+        
+        // 计算尺寸变化
+        const widthDiff = e.clientX - this.resizeStartPos.x;
+        const heightDiff = e.clientY - this.resizeStartPos.y;
+        
+        let newWidth = this.resizeStartSize.width;
+        let newHeight = this.resizeStartSize.height;
+        
+        // 根据调整方向更新尺寸
+        if (this.resizeDirection === 'both' || this.resizeDirection === 'width') {
+            newWidth = this.resizeStartSize.width + widthDiff;
+        }
+        
+        if (this.resizeDirection === 'both' || this.resizeDirection === 'height') {
+            newHeight = this.resizeStartSize.height + heightDiff;
+        }
+        
+        // 确保最小尺寸
+        newWidth = Math.max(10, newWidth);
+        newHeight = Math.max(10, newHeight);
+        
+        // 网格吸附 - 将尺寸对齐到10x10像素的网格
+        const gridSize = 10;
+        newWidth = Math.round(newWidth / gridSize) * gridSize;
+        newHeight = Math.round(newHeight / gridSize) * gridSize;
+        
+        // 应用新尺寸
+        if (this.resizeDirection === 'both' || this.resizeDirection === 'width') {
+            this.selectedElement.style.width = `${newWidth}px`;
+        }
+        
+        if (this.resizeDirection === 'both' || this.resizeDirection === 'height') {
+            this.selectedElement.style.height = `${newHeight}px`;
+        }
+        
+        // 更新元素数据
+        elementData.width = newWidth;
+        elementData.height = newHeight;
+        
+        // 更新参数
+        this.updateElementSize(elementData, newWidth, newHeight);
+    }
+    
     stopDrag() {
         this.isDragging = false;
         // 拖拽结束后触发更新回调
@@ -195,6 +301,37 @@ class LabelDesigner {
                         type: elementData.type,
                         params: elementData.params
                     });
+                }
+            }
+        }
+    }
+    
+    stopResizing() {
+        if (this.isResizing) {
+            this.isResizing = false;
+            this.resizeDirection = null;
+            
+            // 调整大小结束后触发更新回调
+            if (this.onUpdate) {
+                this.onUpdate();
+            }
+            
+            // 更新共享Label实例中的指令
+            if (this.selectedElement) {
+                const elementData = this.elements.find(el => el.element === this.selectedElement);
+                if (elementData) {
+                    // 查找对应的指令并更新
+                    const instructions = this.label.getAllInstructionsWithId();
+                    const instructionToUpdate = instructions.find(inst => 
+                        inst.type === elementData.type && 
+                        JSON.stringify(inst.params) === JSON.stringify(elementData.originalParams));
+                    
+                    if (instructionToUpdate) {
+                        this.label.updateInstruction(instructionToUpdate.id, {
+                            type: elementData.type,
+                            params: elementData.params
+                        });
+                    }
                 }
             }
         }
@@ -359,6 +496,34 @@ class LabelDesigner {
         this.canvas.appendChild(elementData.element);
         
         return elementData;
+    }
+    
+    updateElementSize(elementData, width, height) {
+        // 更新参数
+        switch (elementData.type) {
+            case 'text':
+                elementData.params[2] = width;
+                elementData.params[3] = height;
+                break;
+            case 'barcode':
+                elementData.params[3] = width;
+                elementData.params[4] = height;
+                break;
+            case 'qrcode':
+                // 二维码是正方形，只需要更新一个尺寸参数
+                elementData.params[2] = width;
+                break;
+            case 'image':
+                elementData.params[2] = width;
+                elementData.params[3] = height;
+                break;
+            case 'rectangle':
+                elementData.params[2] = width;
+                elementData.params[3] = height;
+                break;
+        }
+        
+        this.updateInstruction(elementData);
     }
     
     updateElementProperty(element, property, value) {
