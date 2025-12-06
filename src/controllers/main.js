@@ -193,29 +193,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // 同步标签设计器到标签编辑器
-    function syncDesignerToEditor() {
-        if (isSyncing) return;
-        
-        try {
-            isSyncing = true;
-            if (labelDesigner) {
-                // 更新共享Label实例
-                const instructions = labelDesigner.getAllInstructions();
-                sharedLabel.loadFromInstructions(instructions);
-                
-                // 更新标签编辑器内容
-                if (labelEditor) {
-                    labelEditor.syncFromLabel();
-                }
-            }
-        } catch (e) {
-            console.error("同步标签设计器到标签编辑器时出错:", e);
-        } finally {
-            isSyncing = false;
-        }
-    }
-    
     // 当元素被选中时更新属性面板
     function onElementSelected(instruction) {
         if (!instruction) {
@@ -497,11 +474,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // 更新指令输入框中的文本
                 updateInstructionInTextarea(instruction.type, property, value);
-                
-                // 同步标签设计器到标签编辑器
-                if (!isSyncing) {
-                    // syncDesignerToEditor();
-                }
             });
         });
     }
@@ -646,8 +618,55 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 从共享Label实例获取所有指令
                 const instructions = sharedLabel.getAllInstructions();
                 
-                // 将指令转换为文本格式
-                const labelContent = instructions.map(instruction => 
+                // 为每个指令计算坐标值
+                const instructionsWithCoords = instructions.map((instruction, index) => {
+                    let x = 0, y = 0;
+                    
+                    // 根据指令类型提取坐标值
+                    switch (instruction.type) {
+                        case 'text':
+                            x = parseFloat(instruction.params[0]) || 0;
+                            y = parseFloat(instruction.params[1]) || 0;
+                            break;
+                        case 'barcode':
+                            x = parseFloat(instruction.params[1]) || 0;
+                            y = parseFloat(instruction.params[2]) || 0;
+                            break;
+                        case 'qrcode':
+                            x = parseFloat(instruction.params[0]) || 0;
+                            y = parseFloat(instruction.params[1]) || 0;
+                            break;
+                        case 'image':
+                            x = parseFloat(instruction.params[0]) || 0;
+                            y = parseFloat(instruction.params[1]) || 0;
+                            break;
+                        case 'rectangle':
+                            x = parseFloat(instruction.params[0]) || 0;
+                            y = parseFloat(instruction.params[1]) || 0;
+                            break;
+                        case 'line':
+                            x = parseFloat(instruction.params[0]) || 0;
+                            y = parseFloat(instruction.params[1]) || 0;
+                            break;
+                        default:
+                            x = 0;
+                            y = 0;
+                    }
+                    
+                    // 计算坐标值 x + y * 10000
+                    const coordValue = x + y * 10000;
+                    
+                    return {
+                        ...instruction,
+                        coordValue: coordValue
+                    };
+                });
+                
+                // 按照坐标值从小到大排序
+                instructionsWithCoords.sort((a, b) => a.coordValue - b.coordValue);
+                
+                // 将排序后的指令转换为文本格式
+                const labelContent = instructionsWithCoords.map(instruction => 
                     `${instruction.type},${instruction.params.join(',')}`
                 ).join('\n');
                 
