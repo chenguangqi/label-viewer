@@ -14,10 +14,19 @@ src/
 ├── index.html          # 主页面
 ├── styles/
 │   └── main.css        # 主样式文件
-└── js/
-    ├── instruction-parser.js  # 指令解析器
-    ├── label-renderer.js      # 标签渲染器
-    └── main.js                # 主应用入口
+├── models/
+│   ├── instruction.js         # 指令类定义
+│   ├── label.js               # 标签数据模型
+│   ├── instruction-parser.js  # 指令解析器
+│   ├── help-data.js           # 帮助信息数据
+│   └── utils.js               # 工具函数
+├── views/
+│   └── label-renderer.js      # 标签渲染器
+└── controllers/
+    ├── main.js                # 主应用控制器
+    ├── label-editor.js        # 标签编辑器控制器
+    ├── label-designer.js      # 标签设计器控制器
+    └── label-previewer.js     # 标签预览器控制器
 ```
 
 ## 如何运行
@@ -32,3 +41,8 @@ src/
 - 支持多种标签元素（文本、条形码、二维码、图片、直线、矩形等）
 - 实时预览标签效果
 - 响应式设计，适配不同屏幕尺寸
+- 可视化标签设计器，支持拖拽调整元素位置
+- 支持多元素选择和批量属性修改
+- 支持元素对齐方式设置
+- 支持标签指令按坐标排序下载
+- 完善的指令帮助文档系统
