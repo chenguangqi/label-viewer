@@ -385,15 +385,15 @@ header h1::after {
 
 .designer-properties-panel > #properties-content {
     flex: 1;
-    overflow: hidden;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
+    padding-right: 5px;
 }
 
 .designer-properties-panel .property-groups {
     flex: 1;
-    overflow-y: auto;
-    padding-right: 5px;
+    overflow-y: visible;
 }
 
 .designer-properties-panel .property-group {
@@ -411,14 +411,16 @@ header h1::after {
 }
 
 .designer-properties-panel .property-group .property-items {
-    max-height: 200px;
-    overflow-y: auto;
+    max-height: none;
+    overflow-y: visible;
     padding-right: 10px;
 }
 
-/* 当参数较少时，移除固定高度 */
-.designer-properties-panel .property-group:not(.many-params) .property-items {
-    max-height: none;
+/* 当参数数量超过4个时启用滚动条 */
+.designer-properties-panel .property-group.many-params .property-items {
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 10px;
 }
 
 .designer-properties-panel .property-group .property-item {
@@ -439,13 +441,19 @@ header h1::after {
     text-overflow: ellipsis;
 }
 
-.designer-properties-panel .property-group .property-item input[type="number"] {
+.designer-properties-panel .property-group .property-item input[type="number"],
+.designer-properties-panel .property-group .property-item input[type="text"],
+.designer-properties-panel .property-group .property-item input[type="color"],
+.designer-properties-panel .property-group .property-item select {
     flex: 1;
     padding: 8px 12px;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     box-sizing: border-box;
+}
+
+.designer-properties-panel .property-group .property-item input[type="number"] {
     -moz-appearance: textfield; /* Firefox */
 }
 
@@ -460,7 +468,8 @@ header h1::after {
     box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.2);
 }
 
-.designer-properties-panel .property-group .property-item input:focus {
+.designer-properties-panel .property-group .property-item input:focus,
+.designer-properties-panel .property-group .property-item select:focus {
     outline: none;
     border-color: #3498db;
     box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);

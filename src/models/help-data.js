@@ -3,6 +3,11 @@
  * 提供各种指令的帮助信息
  */
 
+// 引入工具函数
+const utils = window.utils || 
+              (typeof require !== 'undefined' ? require('./utils.js') : null);
+var escapeHtml = utils && utils.escapeHtml ? utils.escapeHtml : function(text) { return text; };
+
 class HelpData {
     // 指令定义数据，来源于LABEL_INSTRUCTIONS.md
     static instructions = {
@@ -121,25 +126,6 @@ class HelpData {
      */
     static getInstructionHelp(instructionType) {
         return this.instructions[instructionType] || null;
-    }
-
-     /**
-     * HTML转义函数
-     * @param {string} text - 需要转义的文本
-     * @returns {string} 转义后的文本
-     */
-    static escapeHtml(text) {
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#039;'
-        };
-        
-        return text.replace(/[&<>"']/g, function(m) {
-            return map[m];
-        });
     }
 
     /**

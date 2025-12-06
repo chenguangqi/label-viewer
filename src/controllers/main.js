@@ -13,6 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const helpData = window.HelpData || 
                      (typeof require !== 'undefined' ? require('../models/help-data.js') : null);
     
+    // 引入工具函数
+    const utils = window.utils || 
+                  (typeof require !== 'undefined' ? require('../models/utils.js') : null);
+    const escapeHtml = utils ? utils.escapeHtml : function(text) { return text; };
+    
     // 创建共享的Label实例
     const sharedLabel = new Label();
     
@@ -304,7 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 创建属性组
     function createPropertyGroup(title, properties) {
         // 根据参数数量决定是否添加"many-params"类
-        const manyParamsClass = properties.length > 5 ? 'many-params' : '';
+        const manyParamsClass = properties.length > 4 ? 'many-params' : '';
         
         let html = `<div class="property-group ${manyParamsClass}">
             <h5>${title}</h5>
