@@ -364,7 +364,7 @@ header h1::after {
     z-index: 999;
     height: 100%;
     box-sizing: border-box;
-    padding: 20px;
+    padding: 15px; /* 从20px减小到15px */
     margin-left: 15px;
     display: none; /* 默认隐藏，由JS控制显示 */
     display: flex;
@@ -375,12 +375,13 @@ header h1::after {
     margin-top: 0;
     color: #2c3e50;
     font-weight: 600;
-    padding-bottom: 10px;
+    padding-bottom: 8px; /* 从10px减小到8px */
     border-bottom: 2px solid #eee;
     display: flex;
     align-items: center;
     gap: 8px;
     flex-shrink: 0;
+    font-size: 1.2em; /* 稍微减小标题字体 */
 }
 
 .designer-properties-panel > #properties-content {
@@ -397,13 +398,13 @@ header h1::after {
 }
 
 .designer-properties-panel .property-group {
-    margin-bottom: 15px;
+    margin-bottom: 8px; /* 从10px减小到8px */
     flex-shrink: 0;
 }
 
 .designer-properties-panel .property-group h5 {
     margin-top: 0;
-    margin-bottom: 8px;
+    margin-bottom: 5px; /* 从6px减小到5px */
     color: #2c3e50;
     font-weight: 600;
     padding-bottom: 5px;
@@ -426,7 +427,7 @@ header h1::after {
 .designer-properties-panel .property-group .property-item {
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 5px; /* 从6px减小到5px */
 }
 
 .designer-properties-panel .property-group .property-item label {
@@ -435,10 +436,11 @@ header h1::after {
     color: #34495e;
     width: 35%;
     margin-bottom: 0;
-    margin-right: 10px;
+    margin-right: 6px; /* 从8px减小到6px */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-size: 0.95em; /* 稍微减小字体 */
 }
 
 .designer-properties-panel .property-group .property-item input[type="number"],
@@ -446,11 +448,12 @@ header h1::after {
 .designer-properties-panel .property-group .property-item input[type="color"],
 .designer-properties-panel .property-group .property-item select {
     flex: 1;
-    padding: 8px 12px;
+    padding: 5px 8px; /* 从6px 10px减小到5px 8px */
     border: 1px solid #ddd;
     border-radius: 4px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     box-sizing: border-box;
+    font-size: 0.95em; /* 稍微减小字体 */
 }
 
 .designer-properties-panel .property-group .property-item input[type="number"] {
@@ -475,21 +478,24 @@ header h1::after {
     box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
 }
 
+/* 删除重复的样式定义，保留最新版本 */
 .designer-properties-panel .property-group label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 2px; /* 从3px减小到2px */
     font-weight: 500;
     color: #34495e;
+    font-size: 0.95em; /* 稍微减小字体 */
 }
 
 .designer-properties-panel .property-group input {
     width: 100%;
-    padding: 8px 12px;
+    padding: 5px 8px; /* 从6px 10px减小到5px 8px */
     border: 1px solid #ddd;
     border-radius: 4px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     box-sizing: border-box;
-    margin-bottom: 10px;
+    margin-bottom: 5px; /* 从6px减小到5px */
+    font-size: 0.95em; /* 稍微减小字体 */
 }
 
 .designer-properties-panel .property-group input:focus {
