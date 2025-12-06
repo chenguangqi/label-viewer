@@ -14,9 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
                      (typeof require !== 'undefined' ? require('../models/help-data.js') : null);
     
     // 引入工具函数
-    const utils = window.utils || 
+    const Utils = window.Utils || 
                   (typeof require !== 'undefined' ? require('../models/utils.js') : null);
-    const escapeHtml = utils ? utils.escapeHtml : function(text) { return text; };
     
     // 创建共享的Label实例
     const sharedLabel = new Label();
@@ -235,10 +234,22 @@ document.addEventListener('DOMContentLoaded', () => {
             propertiesPanel.style.display = 'block';
         }
         
+        // 在编辑器的指令帮助区域显示选中元素的帮助信息
+        const helpContent = document.getElementById('current-instruction-help');
+        if (helpContent) {
+            const helpInfo = helpData.getInstructionHelp(instruction.type);
+            if (helpInfo) {
+                helpContent.innerHTML = helpData.generateHelpHTML(helpInfo);
+            } else {
+                helpContent.innerHTML = '<p>未找到该标签指令的帮助信息</p>';
+            }
+        }
+        
         const helpInfo = helpData.getInstructionHelp(instruction.type);
-        if (!helpInfo) {
-            propertiesContent.innerHTML = '<p>未找到该元素的帮助信息</p>';
-            return;
+        if (helpInfo) {
+            helpContent.innerHTML = helpData.generateHelpHTML(helpInfo);
+        } else {
+            propertiesContent.innerHTML = '<p>未找到该标签指令的帮助信息</p>';
         }
         
         let html = `<h4>${helpInfo.name}</h4>`;
