@@ -98,7 +98,7 @@ header h1::after {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     transition: box-shadow 0.3s ease;
     min-width: 0;
-    height: 500px; /* 固定高度以充分利用空间 */
+    height: 700px; /* 增加高度以提供更多展示区域 */
     width: 100%; /* 确保填满父容器宽度 */
     box-sizing: border-box;
 }
@@ -155,7 +155,7 @@ header h1::after {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     transition: box-shadow 0.3s ease;
     min-width: 0;
-    height: 500px; /* 与设计区保持一致 */
+    height: 700px; /* 增加高度以提供更多展示区域 */
     width: 100%;
     box-sizing: border-box;
     overflow: auto;
@@ -188,7 +188,7 @@ header h1::after {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     transition: box-shadow 0.3s ease;
     min-width: 0;
-    height: 500px; /* 固定高度以充分利用空间 */
+    height: 700px; /* 增加高度以提供更多展示区域 */
     width: 100%; /* 确保填满父容器宽度 */
     box-sizing: border-box;
 }
@@ -429,13 +429,25 @@ header h1::after {
     text-overflow: ellipsis;
 }
 
-.designer-properties-panel .property-group .property-item input {
+.designer-properties-panel .property-group .property-item input[type="number"] {
     flex: 1;
     padding: 8px 12px;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     box-sizing: border-box;
+    -moz-appearance: textfield; /* Firefox */
+}
+
+.designer-properties-panel .property-group .property-item input[type="number"]::-webkit-outer-spin-button,
+.designer-properties-panel .property-group .property-item input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.designer-properties-panel .property-group .property-item input[type="number"]:invalid {
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.2);
 }
 
 .designer-properties-panel .property-group .property-item input:focus {

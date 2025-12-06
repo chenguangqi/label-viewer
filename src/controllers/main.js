@@ -286,12 +286,19 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="property-items">`;
             
         properties.forEach(prop => {
+            // 判断是否为位置相关参数
+            const isPositionParam = ['x', 'y', 'width', 'height', 'size', 'x1', 'y1', 'x2', 'y2'].includes(prop.name);
+            
+            // 为位置参数添加额外属性
+            const extraAttrs = isPositionParam ? 'min="0" step="1" oninput="this.value = Math.abs(parseInt(this.value) || 0)"' : '';
+            
             html += `<div class="property-item">
                 <label for="${prop.name}">${prop.label}</label>
                 <input type="${prop.type || 'number'}" 
                        id="${prop.name}"
                        data-property="${prop.name}" 
                        value="${prop.value}" 
+                       ${extraAttrs}
                        ${prop.type === 'text' ? 'style="width: 100%"' : ''}>
                 </div>`;
         });
@@ -305,9 +312,34 @@ document.addEventListener('DOMContentLoaded', () => {
     function bindPropertyControls(instruction) {
         const inputs = propertiesContent.querySelectorAll('input');
         inputs.forEach(input => {
+            // 添加输入事件监听器，用于实时验证
+            input.addEventListener('input', () => {
+                const property = input.dataset.property;
+                // 检查是否为位置相关参数
+                const isPositionParam = ['x', 'y', 'width', 'height', 'size', 'x1', 'y1', 'x2', 'y2'].includes(property);
+                
+                if (isPositionParam) {
+                    // 确保值为非负整数
+                    let value = parseInt(input.value) || 0;
+                    value = Math.abs(value);
+                    input.value = value;
+                }
+            });
+            
+            // 添加更改事件监听器，用于更新属性
             input.addEventListener('change', () => {
                 const property = input.dataset.property;
-                const value = input.value;
+                let value = input.value;
+                
+                // 检查是否为位置相关参数
+                const isPositionParam = ['x', 'y', 'width', 'height', 'size', 'x1', 'y1', 'x2', 'y2'].includes(property);
+                
+                if (isPositionParam) {
+                    // 确保值为非负整数
+                    value = parseInt(value) || 0;
+                    value = Math.abs(value);
+                    input.value = value;
+                }
                 
                 // 更新标签设计器中的元素
                 if (labelDesigner && labelDesigner.selectedElement) {
