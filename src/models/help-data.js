@@ -8,7 +8,7 @@ class HelpData {
     static instructions = {
         'text': {
             name: '文本指令 (text)',
-            syntax: 'text,<x>,<y>,<width>,<height>,<font-size>,<font-family>,<font-weight>,<text-align>,<color>,<text>',
+            syntax: 'text,<x>,<y>,<width>,<height>,<font-size>,<font-family>,<font-weight>,<text-align>,<color>,<content>',
             description: '用于在标签上显示文本内容',
             parameters: [
                 { name: 'x', type: 'number', required: '是', validValues: '数值 ≥ 0', description: '文本左上角X坐标' },
@@ -20,7 +20,7 @@ class HelpData {
                 { name: 'font-weight', type: 'string', required: '是', validValues: 'normal,bold', description: '字体粗细' },
                 { name: 'text-align', type: 'string', required: '是', validValues: 'left,center,right', description: '文本对齐方式' },
                 { name: 'color', type: 'string', required: '是', validValues: '十六进制颜色值，如#FF0000', description: '文本颜色' },
-                { name: 'text', type: 'string', required: '是', validValues: '任意字符串', description: '要显示的文本内容' }
+                { name: 'content', type: 'string', required: '是', validValues: '任意字符串', description: '要显示的文本内容' }
             ],
             remark: '支持Unicode字符，可显示中文等多语言文本',
             samples: [
@@ -29,7 +29,7 @@ class HelpData {
         },
         'barcode': {
             name: '条形码指令 (barcode)',
-            syntax: 'barcode,<type>,<x>,<y>,<width>,<height>,<display-value>,<data>',
+            syntax: 'barcode,<type>,<x>,<y>,<width>,<height>,<display-value>,<content>',
             description: '用于在标签上生成条形码',
             parameters: [
                 { name: 'type', type: 'string', required: '是', validValues: 'CODE128,EAN13,EAN8,CODE39,CODE93等标准条码类型', description: '条形码类型' },
@@ -38,7 +38,7 @@ class HelpData {
                 { name: 'width', type: 'number', required: '是', validValues: '数值 > 0', description: '条形码宽度' },
                 { name: 'height', type: 'number', required: '是', validValues: '数值 > 0', description: '条形码高度' },
                 { name: 'display-value', type: 'boolean', required: '是', validValues: 'true,false', description: '是否显示条码值' },
-                { name: 'data', type: 'string', required: '是', validValues: '符合对应条码类型规则的字符串', description: '条形码数据' }
+                { name: 'content', type: 'string', required: '是', validValues: '符合对应条码类型规则的字符串', description: '条形码内容' }
             ],
             remark: '不同条码类型对数据格式有不同要求',
             samples: [
@@ -47,14 +47,14 @@ class HelpData {
         },
         'qrcode': {
             name: '二维码指令 (qrcode)',
-            syntax: 'qrcode,<x>,<y>,<size>,<ecc>,<data>',
+            syntax: 'qrcode,<x>,<y>,<size>,<ecc>,<content>',
             description: '用于在标签上生成二维码',
             parameters: [
                 { name: 'x', type: 'number', required: '是', validValues: '数值 ≥ 0', description: '二维码左上角X坐标' },
                 { name: 'y', type: 'number', required: '是', validValues: '数值 ≥ 0', description: '二维码左上角Y坐标' },
                 { name: 'size', type: 'number', required: '是', validValues: '数值 > 0', description: '二维码尺寸' },
                 { name: 'ecc', type: 'string', required: '是', validValues: 'L,M,Q,H', description: '纠错等级' },
-                { name: 'data', type: 'string', required: '是', validValues: '任意字符串', description: '二维码数据' }
+                { name: 'content', type: 'string', required: '是', validValues: '任意字符串', description: '二维码内容' }
             ],
             remark: '纠错等级越高可纠正的错误越多，但会降低数据容量',
             samples: [
@@ -128,7 +128,7 @@ class HelpData {
      * @param {string} text - 需要转义的文本
      * @returns {string} 转义后的文本
      */
-    escapeHtml(text) {
+    static escapeHtml(text) {
         const map = {
             '&': '&amp;',
             '<': '&lt;',
@@ -152,7 +152,7 @@ class HelpData {
         <div class="help-item">
             <h3>${helpInfo.name}</h3>
             <h4>指令语法</h4>
-            <p><code>${escapeHtml(helpInfo.syntax)}</code></p>
+            <p><code>${HelpData.escapeHtml(helpInfo.syntax)}</code></p>
             
             <h4>指令描述</h4>
             <p>${helpInfo.description}</p>

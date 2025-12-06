@@ -219,8 +219,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     { label: '高度', name: 'height', value: instruction.params[3] || 30 }
                 ]);
                 
-                html += createPropertyGroup('文本', [
-                    { label: '文字内容', name: 'text', value: instruction.params[9] || '', type: 'text' }
+                html += createPropertyGroup('文本内容', [
+                    { label: '内容', name: 'text', value: instruction.params[9] || '', type: 'text' }
                 ]);
                 break;
                 
@@ -233,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ]);
                 
                 html += createPropertyGroup('条码内容', [
-                    { label: '条码值', name: 'value', value: instruction.params[6] || '', type: 'text' }
+                    { label: '内容', name: 'content', value: instruction.params[6] || '', type: 'text' }
                 ]);
                 break;
                 
@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ]);
                 
                 html += createPropertyGroup('二维码内容', [
-                    { label: '二维码值', name: 'value', value: instruction.params[4] || '', type: 'text' }
+                    { label: '内容', name: 'content', value: instruction.params[4] || '', type: 'text' }
                 ]);
                 break;
                 
@@ -355,7 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 更新标签设计器中的元素
                 if (labelDesigner && labelDesigner.selectedElement) {
                     // 特殊处理条形码和二维码的值参数
-                    if ((instruction.type === 'barcode' || instruction.type === 'qrcode') && property === 'value') {
+                    if ((instruction.type === 'barcode' || instruction.type === 'qrcode') && property === 'content') {
                         // 对于条形码，更新params[6]
                         if (instruction.type === 'barcode') {
                             instruction.params[6] = value;

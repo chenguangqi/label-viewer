@@ -18,7 +18,7 @@ instruction,value1,value2,value3,...
 
 #### 指令语法
 ```
-text,<x>,<y>,<width>,<height>,<font-size>,<font-family>,<font-weight>,<text-align>,<color>,<text>
+text,<x>,<y>,<width>,<height>,<font-size>,<font-family>,<font-weight>,<text-align>,<color>,<content>
 ```
 
 #### 指令描述
@@ -36,7 +36,7 @@ text,<x>,<y>,<width>,<height>,<font-size>,<font-family>,<font-weight>,<text-alig
 | font-weight | string | 是 | normal,bold | 字体粗细 |
 | text-align | string | 是 | left,center,right | 文本对齐方式 |
 | color | string | 是 | 十六进制颜色值，如#FF0000 | 文本颜色 |
-| text | string | 是 | 任意字符串 | 要显示的文本内容 |
+| content | string | 是 | 任意字符串 | 要显示的文本内容 |
 
 #### 指令备注
 - 当指定width且文本超出时会自动换行
@@ -52,7 +52,7 @@ text,10,5,40,8,12,Arial,bold,center,#000000,产品名称
 
 #### 指令语法
 ```
-barcode,<type>,<x>,<y>,<width>,<height>,<display-value>,<data>
+barcode,<type>,<x>,<y>,<width>,<height>,<display-value>,<content>
 ```
 
 #### 指令描述
@@ -67,7 +67,7 @@ barcode,<type>,<x>,<y>,<width>,<height>,<display-value>,<data>
 | width | number | 是 | 数值 > 0 | 条形码宽度 |
 | height | number | 是 | 数值 > 0 | 条形码高度 |
 | display-value | boolean | 是 | true,false | 是否显示条码值 |
-| data | string | 是 | 符合对应条码类型规则的字符串 | 条形码数据 |
+| content | string | 是 | 符合对应条码类型规则的字符串 | 条形码内容 |
 
 #### 指令备注
 - 不同条码类型对数据格式有不同要求
@@ -83,7 +83,7 @@ barcode,CODE128,5,15,50,10,true,1234567890128
 
 #### 指令语法
 ```
-qrcode,<x>,<y>,<size>,<ecc>,<data>
+qrcode,<x>,<y>,<size>,<ecc>,<content>
 ```
 
 #### 指令描述
@@ -96,7 +96,7 @@ qrcode,<x>,<y>,<size>,<ecc>,<data>
 | y | number | 是 | 数值 ≥ 0 | 二维码左上角Y坐标 |
 | size | number | 是 | 数值 > 0 | 二维码尺寸 |
 | ecc | string | 是 | L,M,Q,H | 纠错等级 |
-| data | string | 是 | 任意字符串 | 二维码数据 |
+| content | string | 是 | 任意字符串 | 二维码内容 |
 
 #### 指令备注
 - 数据长度影响二维码密度
