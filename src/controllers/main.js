@@ -278,16 +278,22 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 创建属性组
     function createPropertyGroup(title, properties) {
-        let html = `<div class="property-group">
+        // 根据参数数量决定是否添加"many-params"类
+        const manyParamsClass = properties.length > 5 ? 'many-params' : '';
+        
+        let html = `<div class="property-group ${manyParamsClass}">
             <h5>${title}</h5>
             <div class="property-items">`;
             
         properties.forEach(prop => {
-            html += `<label>${prop.label}</label>
-            <input type="${prop.type || 'number'}" 
-                   data-property="${prop.name}" 
-                   value="${prop.value}" 
-                   ${prop.type === 'text' ? 'style="width: 100%"' : ''}>`;
+            html += `<div class="property-item">
+                <label for="${prop.name}">${prop.label}</label>
+                <input type="${prop.type || 'number'}" 
+                       id="${prop.name}"
+                       data-property="${prop.name}" 
+                       value="${prop.value}" 
+                       ${prop.type === 'text' ? 'style="width: 100%"' : ''}>
+                </div>`;
         });
         
         html += `</div>

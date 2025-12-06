@@ -382,9 +382,8 @@ header h1::after {
 
 .designer-properties-panel .property-groups {
     flex: 1;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    overflow-y: auto;
+    padding-right: 5px;
 }
 
 .designer-properties-panel .property-group {
@@ -404,7 +403,45 @@ header h1::after {
 .designer-properties-panel .property-group .property-items {
     max-height: 200px;
     overflow-y: auto;
-    padding-right: 5px;
+    padding-right: 10px;
+}
+
+/* 当参数较少时，移除固定高度 */
+.designer-properties-panel .property-group:not(.many-params) .property-items {
+    max-height: none;
+}
+
+.designer-properties-panel .property-group .property-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.designer-properties-panel .property-group .property-item label {
+    display: block;
+    font-weight: 500;
+    color: #34495e;
+    width: 35%;
+    margin-bottom: 0;
+    margin-right: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.designer-properties-panel .property-group .property-item input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-sizing: border-box;
+}
+
+.designer-properties-panel .property-group .property-item input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
 }
 
 .designer-properties-panel .property-group label {
