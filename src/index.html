@@ -3,15 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>标签伪指令渲染查看器</title>
+    <title>标签设计器</title>
     <!-- 添加Font Awesome图标库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
+    <!-- 悬浮下载按钮 -->
+    <button id="save-label-btn" class="btn btn-primary floating-save-btn">
+        <i class="fas fa-download"></i> 下载标签指令
+    </button>
+    
     <div class="container">
         <header>
-            <h1><i class="fas fa-tag"></i> 商品标签伪指令设计和实现渲染查看器</h1>
+            <h1><i class="fas fa-tag"></i> 标签指令设计器</h1>
         </header>
         
         <!-- 标签页导航 -->
@@ -29,7 +34,7 @@
         
         <!-- 标签页内容 -->
         <div class="tab-content">
-            <!-- 标签指令编辑区 -->
+            <!-- 标签编辑器 -->
             <div id="editor-tab" class="tab-pane active">
                 <div class="editor-section">
                     <div class="input-group">
@@ -83,12 +88,6 @@
                         </div>
                     </div>
                     
-                    <!-- 保存按钮 -->
-                    <div class="designer-actions">
-                        <button id="save-label-btn" class="btn btn-primary">
-                            <i class="fas fa-save"></i> 保存标签指令
-                        </button>
-                    </div>
                 </div>
             </div>
             

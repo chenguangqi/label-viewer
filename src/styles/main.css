@@ -2,7 +2,7 @@
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 10px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #f5f7fa 0%, #e4edf9 100%);
     min-height: 100vh;
@@ -12,11 +12,12 @@
 header h1 {
     text-align: center;
     color: #2c3e50;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     font-weight: 600;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     position: relative;
-    padding-bottom: 15px;
+    padding-bottom: 10px;
+    font-size: 1.8em;
 }
 
 header h1::after {
@@ -35,7 +36,7 @@ header h1::after {
 .tab-navigation {
     display: flex;
     gap: 5px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     background: white;
     padding: 5px;
     border-radius: 10px;
@@ -44,7 +45,7 @@ header h1::after {
 
 .tab-button {
     flex: 1;
-    padding: 15px 20px;
+    padding: 12px 15px;
     border: none;
     background: #f8f9fa;
     border-radius: 8px;
@@ -56,6 +57,7 @@ header h1::after {
     align-items: center;
     justify-content: center;
     gap: 8px;
+    font-size: 0.9em;
 }
 
 .tab-button:hover {
@@ -484,6 +486,38 @@ header h1::after {
     outline: none;
     border-color: #3498db;
     box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* 悬浮保存按钮样式 */
+.floating-save-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    padding: 12px 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.floating-save-btn:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.floating-save-btn:active {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.floating-save-btn i {
+    margin-right: 8px;
 }
 
 /* 帮助区域样式 */
