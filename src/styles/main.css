@@ -101,7 +101,7 @@ header h1::after {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     transition: box-shadow 0.3s ease;
     min-width: 0;
-    height: 700px; /* 增加高度以提供更多展示区域 */
+    height: 750px; /* 从700px增加到750px以提供更多展示区域 */
     width: 100%; /* 确保填满父容器宽度 */
     box-sizing: border-box;
 }
@@ -158,7 +158,7 @@ header h1::after {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     transition: box-shadow 0.3s ease;
     min-width: 0;
-    height: 700px; /* 增加高度以提供更多展示区域 */
+    height: 750px; /* 从700px增加到750px以提供更多展示区域 */
     width: 100%;
     box-sizing: border-box;
     overflow: auto;
@@ -191,7 +191,7 @@ header h1::after {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     transition: box-shadow 0.3s ease;
     min-width: 0;
-    height: 700px; /* 增加高度以提供更多展示区域 */
+    height: 750px; /* 从700px增加到750px以提供更多展示区域 */
     width: 100%; /* 确保填满父容器宽度 */
     box-sizing: border-box;
 }
