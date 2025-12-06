@@ -65,6 +65,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             helpContent.innerHTML = helpData.generateHelpHTML(helpInfo);
         });
+        
+        // 从sharedLabel初始化编辑器内容
+        labelEditor.syncFromLabel();
     }
     
     // 防止循环同步的标志位
@@ -85,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     labelDesigner.deleteSelectedElement();
                     
                     // 同步到编辑器
-                    syncDesignerToEditor();
+                    // syncDesignerToEditor();
                 }
             }
         }
@@ -138,9 +141,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     propertiesPanel.style.display = 'block';
                 }
                 
-                // 同步标签编辑器到标签设计器
-                syncEditorToDesigner();
-            } 
+                // 从共享Label实例刷新设计器内容
+                if (labelDesigner) {
+                    labelDesigner.refreshFromLabel();
+                }
+            }
             
             // 特殊处理标签编辑器
             if (tabId === 'editor-tab') {
@@ -152,8 +157,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     propertiesPanel.style.display = 'none';
                 }
                 
-                // 同步标签设计器到标签编辑器
-                syncDesignerToEditor();
+                // 从共享Label实例刷新编辑器内容
+                if (labelEditor) {
+                    labelEditor.syncFromLabel();
+                }
             }
         });
     });
@@ -161,10 +168,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // 监听代码同步完成事件
     if (editorContainer) {
         editorContainer.addEventListener('codeSyncComplete', () => {
-            // 如果当前在标签设计器标签页，则同步到标签设计器
+            // 如果当前在标签设计器标签页，则刷新标签设计器
             const activeTab = document.querySelector('.tab-button.active');
             if (activeTab && activeTab.getAttribute('data-tab') === 'designer-tab') {
-                syncEditorToDesigner();
+                if (labelDesigner) {
+                    labelDesigner.refreshFromLabel();
+                }
             }
         });
     }
@@ -471,7 +480,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // 同步标签设计器到标签编辑器
                 if (!isSyncing) {
-                    syncDesignerToEditor();
+                    // syncDesignerToEditor();
                 }
             });
         });

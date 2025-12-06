@@ -880,8 +880,15 @@ class LabelDesigner {
     }
     
     loadInstructions(instructions) {
-        this.clear();
+        // 先保存当前选中的元素信息，以便在重新加载后恢复选中状态
+        const selectedElementData = this.selectedElement ? 
+            this.elements.find(el => el.element === this.selectedElement) : null;
         
+        // 清空画布和元素数组
+        this.canvas.innerHTML = '';
+        this.elements = [];
+        
+        // 重新创建所有元素
         for (const instruction of instructions) {
             // 创建指令类实例
             const instructionInstance = InstructionParser.createInstructionInstance(instruction);
@@ -923,6 +930,23 @@ class LabelDesigner {
             // 添加到Label实例中
             this.label.addInstruction(instruction);
         }
+        
+        // 恢复选中状态
+        if (selectedElementData) {
+            const newElementData = this.elements.find(el => 
+                el.type === selectedElementData.type && 
+                JSON.stringify(el.params) === JSON.stringify(selectedElementData.params)
+            );
+            
+            if (newElementData) {
+                this.selectElement(newElementData.element);
+            }
+        }
+        
+        // 如果没有找到匹配的元素，清空选中状态
+        if (!this.selectedElement && this.onInstructionChange) {
+            this.onInstructionChange(null);
+        }
     }
     
     getAllInstructions() {
@@ -939,6 +963,80 @@ class LabelDesigner {
     
     set selectedElement(element) {
         this._selectedElement = element;
+    }
+    
+    /**
+     * 从共享Label实例刷新设计器内容
+     * 用于在标签页切换时保持设计器与共享数据同步
+     */
+    refreshFromLabel() {
+        // 保存当前选中元素的信息
+        const selectedElementData = this.selectedElement ? 
+            this.elements.find(el => el.element === this.selectedElement) : null;
+        
+        // 清空画布和元素数组
+        this.canvas.innerHTML = '';
+        this.elements = [];
+        
+        // 从共享Label实例获取所有指令
+        const instructions = this.label.getAllInstructions();
+        
+        // 重新创建所有元素
+        for (const instruction of instructions) {
+            // 创建指令类实例
+            const instructionInstance = InstructionParser.createInstructionInstance(instruction);
+            
+            // 根据指令类型提取坐标参数
+            let params = instruction.params;
+            let x, y;
+            
+            switch (instruction.type) {
+                case 'text':
+                    x = parseFloat(params[0]) || 0;
+                    y = parseFloat(params[1]) || 0;
+                    break;
+                case 'barcode':
+                    x = parseFloat(params[1]) || 0;
+                    y = parseFloat(params[2]) || 0;
+                    break;
+                case 'qrcode':
+                    x = parseFloat(params[0]) || 0;
+                    y = parseFloat(params[1]) || 0;
+                    break;
+                case 'image':
+                    x = parseFloat(params[0]) || 0;
+                    y = parseFloat(params[1]) || 0;
+                    break;
+                case 'rectangle':
+                    x = parseFloat(params[0]) || 0;
+                    y = parseFloat(params[1]) || 0;
+                    break;
+                case 'line':
+                    x = parseFloat(params[0]) || 0;
+                    y = parseFloat(params[1]) || 0;
+                    break;
+            }
+            
+            // 创建元素
+            const elementData = this.createElement(instruction.type, params);
+        }
+        
+        // 恢复选中状态
+        if (selectedElementData) {
+            const newElementData = this.elements.find(el => 
+                el.type === selectedElementData.type && 
+                JSON.stringify(el.params) === JSON.stringify(selectedElementData.params)
+            );
+            
+            if (newElementData) {
+                this.selectElement(newElementData.element);
+            }
+        }
+        
+        // 如果没有找到匹配的元素，清空选中状态
+        if (!this.selectedElement && this.onInstructionChange) {
+            this.onInstructionChange(null);
+        }
     }
     
     /**
