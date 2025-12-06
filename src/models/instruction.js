@@ -68,7 +68,19 @@ class TextInstruction extends Instruction {
         element.style.color = this.params[8];
         element.style.display = 'flex';
         element.style.alignItems = 'center';
-        element.style.justifyContent = this.params[7]; // center, flex-start(left), flex-end(right)
+        
+        // 根据文本对齐参数设置justifyContent属性
+        switch (this.params[7]) {
+            case 'center':
+                element.style.justifyContent = 'center';
+                break;
+            case 'right':
+                element.style.justifyContent = 'flex-end';
+                break;
+            default: // 'left' 或其他值
+                element.style.justifyContent = 'flex-start';
+        }
+        
         element.textContent = this.params[9] || '';
         element.style.wordWrap = 'break-word';
         element.style.overflow = 'hidden';

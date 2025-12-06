@@ -78,16 +78,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const activeTab = document.querySelector('.tab-button.active');
         if (activeTab && activeTab.getAttribute('data-tab') === 'designer-tab') {
             // 检查是否按下了Delete键或X键
-            if (event.key === 'Delete' || event.key === 'x' || event.key === 'X') {
+            if (event.key === 'Delete') {
                 // 阻止默认行为
                 event.preventDefault();
                 
                 // 删除选中的元素
                 if (labelDesigner && (labelDesigner.selectedElement || labelDesigner.selectedElements.size > 0)) {
                     labelDesigner.deleteSelectedElement();
-                    
-                    // 同步到编辑器
-                    // syncDesignerToEditor();
                 }
             }
         }
@@ -477,12 +474,24 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         }
                     } else {
-                        // 处理其他属性
-                        labelDesigner.updateElementProperty(
-                            labelDesigner.selectedElement, 
-                            property, 
-                            value
-                        );
+                        // 处理其他属性 - 支持对多个选中元素同时修改属性
+                        if (labelDesigner.selectedElements.size > 1) {
+                            // 如果有多个元素被选中，则更新所有选中元素的属性
+                            labelDesigner.selectedElements.forEach(element => {
+                                labelDesigner.updateElementProperty(
+                                    element, 
+                                    property, 
+                                    value
+                                );
+                            });
+                        } else {
+                            // 如果只有一个元素被选中，则只更新该元素
+                            labelDesigner.updateElementProperty(
+                                labelDesigner.selectedElement, 
+                                property, 
+                                value
+                            );
+                        }
                     }
                 }
                 

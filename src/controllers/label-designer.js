@@ -358,68 +358,39 @@ class LabelDesigner {
     }
     
     dragElement(e) {
+        if (!this.isDragging || !this.selectedElement) return;
+        
         const containerRect = this.canvas.getBoundingClientRect();
+        const mouseX = e.clientX - containerRect.left;
+        const mouseY = e.clientY - containerRect.top;
         
         // 计算主元素的新位置
-        let mainX = e.clientX - containerRect.left - this.dragOffset.x;
-        let mainY = e.clientY - containerRect.top - this.dragOffset.y;
+        const newX = Math.max(0, Math.round((mouseX - this.dragOffset.x) / 10) * 10); // 对齐到10像素网格
+        const newY = Math.max(0, Math.round((mouseY - this.dragOffset.y) / 10) * 10);
         
-        // 边界检查
-        mainX = Math.max(0, Math.min(mainX, containerRect.width - this.selectedElement.offsetWidth));
-        mainY = Math.max(0, Math.min(mainY, containerRect.height - this.selectedElement.offsetHeight));
+        // 计算主元素的偏移量
+        const primaryElementData = this.elements.find(el => el.element === this.selectedElement);
+        if (!primaryElementData) return;
         
-        // 获取主元素的当前位置
-        const mainElementRect = this.selectedElement.getBoundingClientRect();
-        const mainElementData = this.elements.find(el => el.element === this.selectedElement);
-        
-        if (!mainElementData) return;
-        
-        const oldMainX = mainElementData.x;
-        const oldMainY = mainElementData.y;
-        
-        // 计算位置差值
-        const deltaX = mainX - oldMainX;
-        const deltaY = mainY - oldMainY;
-        
-        // 网格吸附 - 将元素位置对齐到10x10像素的网格
-        const gridSize = 10;
-        mainX = Math.round(mainX / gridSize) * gridSize;
-        mainY = Math.round(mainY / gridSize) * gridSize;
+        const deltaX = newX - primaryElementData.x;
+        const deltaY = newY - primaryElementData.y;
         
         // 更新所有选中元素的位置
         this.selectedElements.forEach(element => {
             const elementData = this.elements.find(el => el.element === element);
             if (elementData) {
-                let newX, newY;
-                
-                // 如果是主元素，使用计算好的位置
-                if (element === this.selectedElement) {
-                    newX = mainX;
-                    newY = mainY;
-                } else {
-                    // 其他选中元素根据相对位置移动
-                    newX = elementData.x + deltaX;
-                    newY = elementData.y + deltaY;
-                    
-                    // 应用网格吸附
-                    newX = Math.round(newX / gridSize) * gridSize;
-                    newY = Math.round(newY / gridSize) * gridSize;
-                }
-                
-                // 边界检查
-                newX = Math.max(0, Math.min(newX, containerRect.width - element.offsetWidth));
-                newY = Math.max(0, Math.min(newY, containerRect.height - element.offsetHeight));
+                // 计算新位置
+                const elementNewX = elementData.x + deltaX;
+                const elementNewY = elementData.y + deltaY;
                 
                 // 更新元素位置
-                element.style.left = `${newX}px`;
-                element.style.top = `${newY}px`;
+                elementData.x = elementNewX;
+                elementData.y = elementNewY;
+                element.style.left = `${elementNewX}px`;
+                element.style.top = `${elementNewY}px`;
                 
-                // 更新元素数据
-                elementData.x = newX;
-                elementData.y = newY;
-                
-                // 更新指令参数
-                this.updateInstructionParams(elementData, newX, newY);
+                // 更新元素参数
+                this.updateInstructionParams(elementData, elementNewX, elementNewY);
             }
         });
     }
