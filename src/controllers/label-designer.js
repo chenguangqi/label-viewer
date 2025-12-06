@@ -205,36 +205,94 @@ class LabelDesigner {
         let x = clientX - containerRect.left;
         let y = clientY - containerRect.top;
         
+        // 根据类型创建默认参数
+        let params = [];
+        let defaultWidth = 100;
+        let defaultHeight = 30;
+        
+        switch (type) {
+            case 'text':
+                defaultWidth = 100;
+                defaultHeight = 30;
+                params = [x, y, defaultWidth, defaultHeight, 12, 'Arial', 'normal', 'left', '#000000', '文本'];
+                break;
+            case 'barcode':
+                defaultWidth = 100;
+                defaultHeight = 30;
+                params = ['CODE128', x, y, defaultWidth, defaultHeight, 'true', '1234567890128'];
+                break;
+            case 'qrcode':
+                defaultWidth = 50;
+                defaultHeight = 50;
+                params = [x, y, defaultWidth, 'Q', 'https://example.com'];
+                break;
+            case 'image':
+                defaultWidth = 50;
+                defaultHeight = 50;
+                params = [x, y, defaultWidth, defaultHeight, 'image.png'];
+                break;
+            case 'line':
+                defaultWidth = 50;
+                defaultHeight = 1; // 线条高度为1
+                params = [x, y, x + defaultWidth, y, 1, '#000000'];
+                break;
+            case 'rectangle':
+                defaultWidth = 100;
+                defaultHeight = 50;
+                params = [x, y, defaultWidth, defaultHeight, 1, 'transparent', '#000000'];
+                break;
+        }
+        
+        // 调整坐标使元素以鼠标位置为中心点
+        x = x - defaultWidth / 2;
+        y = y - defaultHeight / 2;
+        
         // 根据网格间距调整坐标（网格吸附）
         const gridSize = 10; // 与拖拽时使用的网格大小保持一致
         x = Math.round(x / gridSize) * gridSize;
         y = Math.round(y / gridSize) * gridSize;
         
-        // 根据类型创建默认参数
-        let params = [];
+        // 根据元素大小调整坐标，确保元素完全在画布内
+        x = Math.max(0, Math.min(x, containerRect.width - defaultWidth));
+        y = Math.max(0, Math.min(y, containerRect.height - defaultHeight));
+        
+        // 更新参数中的坐标
         switch (type) {
             case 'text':
-                params = [x, y, 100, 30, 12, 'Arial', 'normal', 'left', '#000000', '文本'];
+                params[0] = x;
+                params[1] = y;
                 break;
             case 'barcode':
-                params = ['CODE128', x, y, 100, 30, 'true', '1234567890128'];
+                params[1] = x;
+                params[2] = y;
                 break;
             case 'qrcode':
-                params = [x, y, 50, 'Q', 'https://example.com'];
+                params[0] = x;
+                params[1] = y;
                 break;
             case 'image':
-                params = [x, y, 50, 50, 'image.png'];
+                params[0] = x;
+                params[1] = y;
                 break;
             case 'line':
-                params = [x, y, x + 50, y, 1, '#000000'];
+                const lineLength = params[2] - params[0]; // 保存线段长度
+                params[0] = x;
+                params[1] = y;
+                params[2] = x + lineLength; // 保持线段长度不变
+                params[3] = y;
                 break;
             case 'rectangle':
-                params = [x, y, 100, 50, 1, 'transparent', '#000000'];
+                params[0] = x;
+                params[1] = y;
                 break;
         }
         
         // 创建元素
         const elementData = this.createElement(type, params);
+        
+        // 确保元素位置准确设置
+        elementData.element.style.left = `${x}px`;
+        elementData.element.style.top = `${y}px`;
         
         // 添加到Label实例中
         const instruction = {
