@@ -78,9 +78,20 @@ class LabelDesigner {
         // 鼠标按下事件
         this.canvas.addEventListener('mousedown', (e) => {
             if (e.target.classList.contains('draggable-element')) {
-                // 检查是否按住Ctrl键进行多选
+                // 检查是否按住Ctrl键进行多选，或者在多选状态下点击已选中元素（支持多选拖拽）
                 if (e.ctrlKey || e.metaKey) {
                     this.toggleElementSelection(e.target);
+                } else if (this.selectedElements.size > 1 && this.selectedElements.has(e.target)) {
+                    // 如果已有多个元素被选中且点击的是已选中元素，则只更新主选中元素，不切换选中状态
+                    this.selectedElement = e.target;
+                    
+                    // 触发属性面板更新
+                    if (this.onInstructionChange) {
+                        const elementData = this.elements.find(el => el.element === e.target);
+                        if (elementData) {
+                            this.onInstructionChange(this.getElementInstruction(elementData));
+                        }
+                    }
                 } else {
                     this.selectElement(e.target);
                 }
@@ -196,6 +207,21 @@ class LabelDesigner {
      * 选择单个元素
      */
     selectElement(element) {
+        // 如果已经有多个元素被选中，且当前元素已经是选中状态，则不执行任何操作
+        if (this.selectedElements.size > 1 && this.selectedElements.has(element)) {
+            // 更新主选中元素
+            this.selectedElement = element;
+            
+            // 触发属性面板更新
+            if (this.onInstructionChange) {
+                const elementData = this.elements.find(el => el.element === element);
+                if (elementData) {
+                    this.onInstructionChange(this.getElementInstruction(elementData));
+                }
+            }
+            return;
+        }
+        
         // 取消之前所有选中元素的高亮
         this.deselectAllElements();
         
@@ -1216,6 +1242,9 @@ class LabelDesigner {
                         this.onInstructionChange(this.getElementInstruction(elementData));
                     }
                 }
+            } else {
+                // 如果框选区域内没有元素，则取消所有选中状态
+                this.deselectAllElements();
             }
         }
     }
