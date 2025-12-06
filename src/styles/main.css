@@ -366,7 +366,6 @@ header h1::after {
     box-sizing: border-box;
     padding: 15px; /* 从20px减小到15px */
     margin-left: 15px;
-    display: none; /* 默认隐藏，由JS控制显示 */
     display: flex;
     flex-direction: column;
 }
@@ -402,6 +401,7 @@ header h1::after {
     flex-shrink: 0;
 }
 
+/* 属性组内的标题样式 */
 .designer-properties-panel .property-group h5 {
     margin-top: 0;
     margin-bottom: 5px; /* 从6px减小到5px */
@@ -409,6 +409,16 @@ header h1::after {
     font-weight: 600;
     padding-bottom: 5px;
     border-bottom: 1px solid #eee;
+}
+
+/* 属性面板中主标题样式（元素类型标题） */
+.designer-properties-panel > #properties-content > h4 {
+    margin: 0 0 10px 0; /* 上右下左 */
+    color: #2c3e50; /* 浅灰色 */
+    font-weight: 600;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eee;
+    font-size: 1.1em;
 }
 
 .designer-properties-panel .property-group .property-items {
