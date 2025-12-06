@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 event.preventDefault();
                 
                 // 删除选中的元素
-                if (labelDesigner && labelDesigner.selectedElement) {
+                if (labelDesigner && (labelDesigner.selectedElement || labelDesigner.selectedElements.size > 0)) {
                     labelDesigner.deleteSelectedElement();
                     
                     // 同步到编辑器

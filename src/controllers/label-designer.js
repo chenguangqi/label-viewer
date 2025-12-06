@@ -9,6 +9,7 @@ class LabelDesigner {
         this.onInstructionChange = onInstructionChange;
         this.onUpdate = null; // 添加更新回调
         this.selectedElement = null;
+        this.selectedElements = new Set(); // 用于存储多选元素
         this.elements = [];
         this.isDragging = false;
         this.isResizing = false;
@@ -16,6 +17,10 @@ class LabelDesigner {
         this.resizeDirection = null;
         this.resizeStartSize = { width: 0, height: 0 };
         this.resizeStartPos = { x: 0, y: 0 };
+        this.isMarqueeSelecting = false; // 框选状态
+        this.marqueeStartPos = { x: 0, y: 0 }; // 框选起始位置
+        this.marqueeElement = null; // 框选元素
+        this.isCtrlPressed = false; // Ctrl键状态
         
         // 使用传入的Label实例或者创建一个新的实例
         this.label = labelInstance || new Label();
@@ -73,7 +78,12 @@ class LabelDesigner {
         // 鼠标按下事件
         this.canvas.addEventListener('mousedown', (e) => {
             if (e.target.classList.contains('draggable-element')) {
-                this.selectElement(e.target);
+                // 检查是否按住Ctrl键进行多选
+                if (e.ctrlKey || e.metaKey) {
+                    this.toggleElementSelection(e.target);
+                } else {
+                    this.selectElement(e.target);
+                }
                 
                 // 检查是否在元素边缘（调整大小区域）
                 const rect = e.target.getBoundingClientRect();
@@ -91,8 +101,18 @@ class LabelDesigner {
                 } else {
                     this.startDrag(e);
                 }
+            } else if (e.target === this.canvas) {
+                // 在画布上开始框选
+                this.startMarqueeSelection(e);
             } else {
-                this.deselectElement();
+                this.deselectAllElements();
+            }
+        });
+        
+        // 双击事件 - 编辑content属性
+        this.canvas.addEventListener('dblclick', (e) => {
+            if (e.target.classList.contains('draggable-element')) {
+                this.editElementContent(e.target);
             }
         });
         
@@ -102,6 +122,8 @@ class LabelDesigner {
                 this.dragElement(e);
             } else if (this.isResizing && this.selectedElement) {
                 this.resizeElement(e);
+            } else if (this.isMarqueeSelecting) {
+                this.updateMarqueeSelection(e);
             }
             
             // 显示调整大小的光标
@@ -125,9 +147,10 @@ class LabelDesigner {
         });
         
         // 鼠标释放事件
-        document.addEventListener('mouseup', () => {
+        document.addEventListener('mouseup', (e) => {
             this.stopDrag();
             this.stopResizing();
+            this.stopMarqueeSelection();
         });
         
         // 拖拽放置事件
@@ -146,17 +169,40 @@ class LabelDesigner {
                 }
             }
         });
+        
+        // 键盘事件
+        document.addEventListener('keydown', (e) => {
+            // 跟踪Ctrl键状态
+            if (e.key === 'Control' || e.key === 'Meta') {
+                this.isCtrlPressed = true;
+            }
+            
+            // 检查是否按下了Ctrl+A全选
+            if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
+                e.preventDefault();
+                this.selectAllElements();
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            // 跟踪Ctrl键状态
+            if (e.key === 'Control' || e.key === 'Meta') {
+                this.isCtrlPressed = false;
+            }
+        });
     }
     
+    /**
+     * 选择单个元素
+     */
     selectElement(element) {
-        // 取消之前选中元素的高亮
-        if (this.selectedElement) {
-            this.selectedElement.style.outline = '';
-        }
+        // 取消之前所有选中元素的高亮
+        this.deselectAllElements();
         
         // 选中新元素
         this.selectedElement = element;
-        this.selectedElement.style.outline = '2px solid #007bff';
+        this.selectedElements.add(element);
+        element.style.outline = '2px solid #007bff';
         
         // 触发属性面板更新
         if (this.onInstructionChange) {
@@ -167,11 +213,56 @@ class LabelDesigner {
         }
     }
     
-    deselectElement() {
-        if (this.selectedElement) {
-            this.selectedElement.style.outline = '';
-            this.selectedElement = null;
+    /**
+     * 切换单个元素的选中状态
+     */
+    toggleElementSelection(element) {
+        if (this.selectedElements.has(element)) {
+            // 如果已选中，则取消选中
+            this.selectedElements.delete(element);
+            element.style.outline = '';
+            
+            // 如果取消选中的是当前主选中元素，则更新主选中元素
+            if (this.selectedElement === element) {
+                this.selectedElement = this.selectedElements.size > 0 ? 
+                    Array.from(this.selectedElements)[0] : null;
+            }
+        } else {
+            // 如果未选中，则添加到选中集合
+            this.selectedElements.add(element);
+            element.style.outline = '2px solid #007bff';
+            
+            // 如果这是第一个选中的元素，则设为主选中元素
+            if (!this.selectedElement) {
+                this.selectedElement = element;
+            }
         }
+        
+        // 触发属性面板更新
+        if (this.onInstructionChange) {
+            if (this.selectedElement) {
+                const elementData = this.elements.find(el => el.element === this.selectedElement);
+                if (elementData) {
+                    this.onInstructionChange(this.getElementInstruction(elementData));
+                }
+            } else {
+                this.onInstructionChange(null);
+            }
+        }
+    }
+    
+    /**
+     * 取消所有元素的选中状态
+     */
+    deselectAllElements() {
+        // 取消所有元素的高亮
+        this.selectedElements.forEach(element => {
+            element.style.outline = '';
+        });
+        
+        // 清空选中集合
+        this.selectedElements.clear();
+        this.selectedElement = null;
         
         // 触发属性面板更新，传入null表示没有选中元素
         if (this.onInstructionChange) {
@@ -179,12 +270,48 @@ class LabelDesigner {
         }
     }
     
+    /**
+     * 选择所有元素
+     */
+    selectAllElements() {
+        // 清空当前选中状态
+        this.deselectAllElements();
+        
+        // 选中所有元素
+        this.elements.forEach(elementData => {
+            const element = elementData.element;
+            this.selectedElements.add(element);
+            element.style.outline = '2px solid #007bff';
+        });
+        
+        // 设置第一个元素为主选中元素
+        if (this.elements.length > 0) {
+            this.selectedElement = this.elements[0].element;
+            
+            // 触发属性面板更新
+            if (this.onInstructionChange) {
+                const elementData = this.elements[0];
+                if (elementData) {
+                    this.onInstructionChange(this.getElementInstruction(elementData));
+                }
+            }
+        } else {
+            // 触发属性面板更新，传入null表示没有选中元素
+            if (this.onInstructionChange) {
+                this.onInstructionChange(null);
+            }
+        }
+    }
+    
     startDrag(e) {
         this.isDragging = true;
         this.isResizing = false; // 确保不是在调整大小
+        
+        // 获取主元素的边界框
         const rect = this.selectedElement.getBoundingClientRect();
         const containerRect = this.canvas.getBoundingClientRect();
         
+        // 计算主元素的拖动偏移量
         this.dragOffset.x = e.clientX - rect.left;
         this.dragOffset.y = e.clientY - rect.top;
     }
@@ -207,28 +334,68 @@ class LabelDesigner {
     dragElement(e) {
         const containerRect = this.canvas.getBoundingClientRect();
         
-        let x = e.clientX - containerRect.left - this.dragOffset.x;
-        let y = e.clientY - containerRect.top - this.dragOffset.y;
+        // 计算主元素的新位置
+        let mainX = e.clientX - containerRect.left - this.dragOffset.x;
+        let mainY = e.clientY - containerRect.top - this.dragOffset.y;
         
         // 边界检查
-        x = Math.max(0, Math.min(x, containerRect.width - this.selectedElement.offsetWidth));
-        y = Math.max(0, Math.min(y, containerRect.height - this.selectedElement.offsetHeight));
+        mainX = Math.max(0, Math.min(mainX, containerRect.width - this.selectedElement.offsetWidth));
+        mainY = Math.max(0, Math.min(mainY, containerRect.height - this.selectedElement.offsetHeight));
         
-        // 网格吸附 - 将元素位置对齐到10x10像素的网格（从原来的20x20调整）
-        const gridSize = 10; // 从20调整为10
-        x = Math.round(x / gridSize) * gridSize;
-        y = Math.round(y / gridSize) * gridSize;
+        // 获取主元素的当前位置
+        const mainElementRect = this.selectedElement.getBoundingClientRect();
+        const mainElementData = this.elements.find(el => el.element === this.selectedElement);
         
-        this.selectedElement.style.left = `${x}px`;
-        this.selectedElement.style.top = `${y}px`;
+        if (!mainElementData) return;
         
-        // 更新元素数据
-        const elementData = this.elements.find(el => el.element === this.selectedElement);
-        if (elementData) {
-            elementData.x = x;
-            elementData.y = y;
-            this.updateInstructionParams(elementData, x, y);
-        }
+        const oldMainX = mainElementData.x;
+        const oldMainY = mainElementData.y;
+        
+        // 计算位置差值
+        const deltaX = mainX - oldMainX;
+        const deltaY = mainY - oldMainY;
+        
+        // 网格吸附 - 将元素位置对齐到10x10像素的网格
+        const gridSize = 10;
+        mainX = Math.round(mainX / gridSize) * gridSize;
+        mainY = Math.round(mainY / gridSize) * gridSize;
+        
+        // 更新所有选中元素的位置
+        this.selectedElements.forEach(element => {
+            const elementData = this.elements.find(el => el.element === element);
+            if (elementData) {
+                let newX, newY;
+                
+                // 如果是主元素，使用计算好的位置
+                if (element === this.selectedElement) {
+                    newX = mainX;
+                    newY = mainY;
+                } else {
+                    // 其他选中元素根据相对位置移动
+                    newX = elementData.x + deltaX;
+                    newY = elementData.y + deltaY;
+                    
+                    // 应用网格吸附
+                    newX = Math.round(newX / gridSize) * gridSize;
+                    newY = Math.round(newY / gridSize) * gridSize;
+                }
+                
+                // 边界检查
+                newX = Math.max(0, Math.min(newX, containerRect.width - element.offsetWidth));
+                newY = Math.max(0, Math.min(newY, containerRect.height - element.offsetHeight));
+                
+                // 更新元素位置
+                element.style.left = `${newX}px`;
+                element.style.top = `${newY}px`;
+                
+                // 更新元素数据
+                elementData.x = newX;
+                elementData.y = newY;
+                
+                // 更新指令参数
+                this.updateInstructionParams(elementData, newX, newY);
+            }
+        });
     }
     
     resizeElement(e) {
@@ -287,8 +454,8 @@ class LabelDesigner {
         }
         
         // 更新共享Label实例中的指令
-        if (this.selectedElement) {
-            const elementData = this.elements.find(el => el.element === this.selectedElement);
+        this.selectedElements.forEach(element => {
+            const elementData = this.elements.find(el => el.element === element);
             if (elementData) {
                 // 查找对应的指令并更新
                 const instructions = this.label.getAllInstructionsWithId();
@@ -303,7 +470,7 @@ class LabelDesigner {
                     });
                 }
             }
-        }
+        });
     }
     
     stopResizing() {
@@ -526,6 +693,84 @@ class LabelDesigner {
         this.updateInstruction(elementData);
     }
     
+    /**
+     * 编辑元素的content属性
+     */
+    editElementContent(element) {
+        const elementData = this.elements.find(el => el.element === element);
+        if (!elementData) return;
+        
+        // 检查元素类型是否支持content属性编辑
+        if (!['text', 'barcode', 'qrcode'].includes(elementData.type)) {
+            return;
+        }
+        
+        // 获取当前content值
+        let currentValue = '';
+        switch (elementData.type) {
+            case 'text':
+                currentValue = elementData.params[9] || '';
+                break;
+            case 'barcode':
+                currentValue = elementData.params[6] || '';
+                break;
+            case 'qrcode':
+                currentValue = elementData.params[4] || '';
+                break;
+        }
+        
+        // 创建输入框
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = currentValue;
+        input.style.position = 'absolute';
+        input.style.left = element.style.left;
+        input.style.top = element.style.top;
+        input.style.width = element.style.width;
+        input.style.height = element.style.height;
+        input.style.zIndex = '1000';
+        input.style.fontSize = elementData.type === 'text' ? element.style.fontSize : '12px';
+        input.style.textAlign = elementData.type === 'text' ? 
+            (element.style.justifyContent === 'center' ? 'center' : 
+             element.style.justifyContent === 'flex-end' ? 'right' : 'left') : 'left';
+        
+        // 添加到画布中
+        this.canvas.appendChild(input);
+        
+        // 聚焦并全选文本
+        input.focus();
+        input.select();
+        
+        // 处理输入完成事件
+        const finishEditing = () => {
+            const newValue = input.value;
+            
+            // 移除输入框
+            input.remove();
+            
+            // 更新元素内容
+            this.updateElementProperty(element, 'content', newValue);
+            
+            // 更新共享Label实例
+            if (this.onUpdate) {
+                this.onUpdate();
+            }
+        };
+        
+        // 绑定事件
+        input.addEventListener('blur', finishEditing);
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                finishEditing();
+            } else if (e.key === 'Escape') {
+                input.remove();
+            }
+        });
+    }
+    
+    /**
+     * 更新元素属性
+     */
     updateElementProperty(element, property, value) {
         const elementData = this.elements.find(el => el.element === element);
         if (elementData) {
@@ -537,73 +782,24 @@ class LabelDesigner {
                 // 创建指令类实例
                 const instructionInstance = InstructionParser.createInstructionInstance(instructionObj);
                 
-                // 更新标签设计器元素属性
-                instructionInstance.updateDesignerElementProperty(elementData, property, value);
-                
-                // 更新参数
-                switch (property) {
-                    case 'x':
-                        if (elementData.type === 'barcode') {
-                            elementData.params[1] = value;
-                        } else {
-                            elementData.params[0] = value;
-                        }
-                        break;
-                    case 'y':
-                        if (elementData.type === 'barcode') {
-                            elementData.params[2] = value;
-                        } else {
-                            elementData.params[1] = value;
-                        }
-                        break;
-                    case 'width':
-                        if (elementData.type === 'text') {
-                            elementData.params[2] = value;
-                        } else if (elementData.type === 'barcode') {
-                            elementData.params[3] = value;
-                        } else if (['image', 'rectangle'].includes(elementData.type)) {
-                            elementData.params[2] = value;
-                        }
-                        break;
-                    case 'height':
-                        if (elementData.type === 'text') {
-                            elementData.params[3] = value;
-                        } else if (elementData.type === 'barcode') {
-                            elementData.params[4] = value;
-                        } else if (['image', 'rectangle'].includes(elementData.type)) {
-                            elementData.params[3] = value;
-                        }
-                        break;
-                    case 'text':
-                        if (elementData.type === 'text') {
+                // 特殊处理content属性
+                if (property === 'content') {
+                    switch (elementData.type) {
+                        case 'text':
                             elementData.params[9] = value;
-                        }
-                        break;
-                    case 'size':
-                        if (elementData.type === 'qrcode') {
-                            elementData.params[2] = value;
-                        }
-                        break;
-                    case 'x1':
-                        if (elementData.type === 'line') {
-                            elementData.params[0] = value;
-                        }
-                        break;
-                    case 'y1':
-                        if (elementData.type === 'line') {
-                            elementData.params[1] = value;
-                        }
-                        break;
-                    case 'x2':
-                        if (elementData.type === 'line') {
-                            elementData.params[2] = value;
-                        }
-                        break;
-                    case 'y2':
-                        if (elementData.type === 'line') {
-                            elementData.params[3] = value;
-                        }
-                        break;
+                            elementData.text = value;
+                            elementData.element.textContent = value;
+                            break;
+                        case 'barcode':
+                            elementData.params[6] = value;
+                            break;
+                        case 'qrcode':
+                            elementData.params[4] = value;
+                            break;
+                    }
+                } else {
+                    // 更新标签设计器元素属性
+                    instructionInstance.updateDesignerElementProperty(elementData, property, value);
                 }
                 
                 this.updateInstruction(elementData);
@@ -749,41 +945,180 @@ class LabelDesigner {
      * 删除选中的元素
      */
     deleteSelectedElement() {
-        if (!this.selectedElement) return;
+        if (this.selectedElements.size === 0) return;
         
-        // 从elements数组中找到要删除的元素
-        const elementIndex = this.elements.findIndex(el => el.element === this.selectedElement);
-        if (elementIndex === -1) return;
+        // 创建要删除的元素数组副本，因为我们会修改selectedElements集合
+        const elementsToDelete = Array.from(this.selectedElements);
         
-        const elementData = this.elements[elementIndex];
-        
-        // 从canvas中移除元素
-        this.canvas.removeChild(this.selectedElement);
-        
-        // 从elements数组中移除
-        this.elements.splice(elementIndex, 1);
+        elementsToDelete.forEach(element => {
+            // 从elements数组中找到要删除的元素
+            const elementIndex = this.elements.findIndex(el => el.element === element);
+            if (elementIndex === -1) return;
+            
+            const elementData = this.elements[elementIndex];
+            
+            // 从canvas中移除元素
+            this.canvas.removeChild(element);
+            
+            // 从elements数组中移除
+            this.elements.splice(elementIndex, 1);
+            
+            // 从selectedElements集合中移除
+            this.selectedElements.delete(element);
+        });
         
         // 从label实例中移除对应的指令
         const instructions = this.label.getAllInstructionsWithId();
-        const instructionToRemove = instructions.find(inst => 
-            inst.type === elementData.type && 
-            JSON.stringify(inst.params) === JSON.stringify(elementData.originalParams));
-            
-        if (instructionToRemove) {
-            this.label.removeInstruction(instructionToRemove.id);
-        }
+        elementsToDelete.forEach(element => {
+            const elementData = this.elements.find(el => el.element === element);
+            if (elementData) {
+                const instructionToRemove = instructions.find(inst => 
+                    inst.type === elementData.type && 
+                    JSON.stringify(inst.params) === JSON.stringify(elementData.originalParams));
+                    
+                if (instructionToRemove) {
+                    this.label.removeInstruction(instructionToRemove.id);
+                }
+            }
+        });
         
-        // 取消选中状态
-        this.selectedElement = null;
+        // 更新选中状态
+        if (this.selectedElements.size === 0) {
+            this.selectedElement = null;
+        } else if (!this.selectedElements.has(this.selectedElement)) {
+            // 如果主选中元素被删除了，选择集合中的第一个元素作为新的主选中元素
+            this.selectedElement = Array.from(this.selectedElements)[0];
+        }
         
         // 触发属性面板更新
         if (this.onInstructionChange) {
-            this.onInstructionChange(null);
+            if (this.selectedElement) {
+                const elementData = this.elements.find(el => el.element === this.selectedElement);
+                if (elementData) {
+                    this.onInstructionChange(this.getElementInstruction(elementData));
+                }
+            } else {
+                this.onInstructionChange(null);
+            }
         }
         
         // 触发更新回调
         if (this.onUpdate) {
             this.onUpdate();
+        }
+    }
+    
+    /**
+     * 开始框选
+     */
+    startMarqueeSelection(e) {
+        this.isMarqueeSelecting = true;
+        const containerRect = this.canvas.getBoundingClientRect();
+        this.marqueeStartPos.x = e.clientX - containerRect.left;
+        this.marqueeStartPos.y = e.clientY - containerRect.top;
+        
+        // 创建框选元素
+        this.marqueeElement = document.createElement('div');
+        this.marqueeElement.style.position = 'absolute';
+        this.marqueeElement.style.border = '2px dashed #007bff';
+        this.marqueeElement.style.backgroundColor = 'rgba(0, 123, 255, 0.1)';
+        this.marqueeElement.style.pointerEvents = 'none';
+        this.marqueeElement.style.zIndex = '9999';
+        this.marqueeElement.style.left = this.marqueeStartPos.x + 'px';
+        this.marqueeElement.style.top = this.marqueeStartPos.y + 'px';
+        this.marqueeElement.style.width = '0px';
+        this.marqueeElement.style.height = '0px';
+        
+        this.canvas.appendChild(this.marqueeElement);
+    }
+    
+    /**
+     * 更新框选区域
+     */
+    updateMarqueeSelection(e) {
+        if (!this.isMarqueeSelecting || !this.marqueeElement) return;
+        
+        const containerRect = this.canvas.getBoundingClientRect();
+        const currentX = e.clientX - containerRect.left;
+        const currentY = e.clientY - containerRect.top;
+        
+        const left = Math.min(this.marqueeStartPos.x, currentX);
+        const top = Math.min(this.marqueeStartPos.y, currentY);
+        const width = Math.abs(currentX - this.marqueeStartPos.x);
+        const height = Math.abs(currentY - this.marqueeStartPos.y);
+        
+        this.marqueeElement.style.left = left + 'px';
+        this.marqueeElement.style.top = top + 'px';
+        this.marqueeElement.style.width = width + 'px';
+        this.marqueeElement.style.height = height + 'px';
+    }
+    
+    /**
+     * 结束框选
+     */
+    stopMarqueeSelection() {
+        if (!this.isMarqueeSelecting) return;
+        
+        this.isMarqueeSelecting = false;
+        
+        if (this.marqueeElement) {
+            // 获取框选区域相对于画布的位置
+            const marqueeRect = this.marqueeElement.getBoundingClientRect();
+            const canvasRect = this.canvas.getBoundingClientRect();
+            
+            const marqueeLeft = marqueeRect.left - canvasRect.left;
+            const marqueeTop = marqueeRect.top - canvasRect.top;
+            const marqueeRight = marqueeLeft + marqueeRect.width;
+            const marqueeBottom = marqueeTop + marqueeRect.height;
+            
+            // 移除框选元素
+            this.marqueeElement.remove();
+            this.marqueeElement = null;
+            
+            // 检查哪些元素在框选区域内
+            const elementsInMarquee = [];
+            this.elements.forEach(elementData => {
+                const element = elementData.element;
+                const elementRect = element.getBoundingClientRect();
+                
+                const elementLeft = elementRect.left - canvasRect.left;
+                const elementTop = elementRect.top - canvasRect.top;
+                const elementRight = elementLeft + elementRect.width;
+                const elementBottom = elementTop + elementRect.height;
+                
+                // 检查元素是否与框选区域相交
+                if (!(elementRight < marqueeLeft || 
+                      elementLeft > marqueeRight || 
+                      elementBottom < marqueeTop || 
+                      elementTop > marqueeBottom)) {
+                    elementsInMarquee.push(element);
+                }
+            });
+            
+            // 如果有元素在框选区域内，则选中它们
+            if (elementsInMarquee.length > 0) {
+                // 如果没有按住Ctrl键，则先清空之前的选中状态
+                if (!this.isCtrlPressed) {
+                    this.deselectAllElements();
+                }
+                
+                // 选中框选区域内的所有元素
+                elementsInMarquee.forEach(element => {
+                    this.selectedElements.add(element);
+                    element.style.outline = '2px solid #007bff';
+                });
+                
+                // 设置第一个元素为主选中元素
+                this.selectedElement = elementsInMarquee[0];
+                
+                // 触发属性面板更新
+                if (this.onInstructionChange) {
+                    const elementData = this.elements.find(el => el.element === this.selectedElement);
+                    if (elementData) {
+                        this.onInstructionChange(this.getElementInstruction(elementData));
+                    }
+                }
+            }
         }
     }
 }
