@@ -202,8 +202,13 @@ class LabelDesigner {
     
     addElementFromToolbox(type, clientX, clientY) {
         const containerRect = this.canvas.getBoundingClientRect();
-        const x = clientX - containerRect.left;
-        const y = clientY - containerRect.top;
+        let x = clientX - containerRect.left;
+        let y = clientY - containerRect.top;
+        
+        // 根据网格间距调整坐标（网格吸附）
+        const gridSize = 10; // 与拖拽时使用的网格大小保持一致
+        x = Math.round(x / gridSize) * gridSize;
+        y = Math.round(y / gridSize) * gridSize;
         
         // 根据类型创建默认参数
         let params = [];
