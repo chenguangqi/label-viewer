@@ -1045,12 +1045,15 @@ class LabelDesigner {
         // 创建要删除的元素数组副本，因为我们会修改selectedElements集合
         const elementsToDelete = Array.from(this.selectedElements);
         
+        // 保存要删除的元素数据，因为在从elements数组中移除后就无法再获取到了
+        const elementDataToDelete = elementsToDelete.map(element => {
+            return this.elements.find(el => el.element === element);
+        }).filter(el => el !== undefined); // 过滤掉未找到的元素
+        
         elementsToDelete.forEach(element => {
             // 从elements数组中找到要删除的元素
             const elementIndex = this.elements.findIndex(el => el.element === element);
             if (elementIndex === -1) return;
-            
-            const elementData = this.elements[elementIndex];
             
             // 从canvas中移除元素
             this.canvas.removeChild(element);
@@ -1064,16 +1067,13 @@ class LabelDesigner {
         
         // 从label实例中移除对应的指令
         const instructions = this.label.getAllInstructionsWithId();
-        elementsToDelete.forEach(element => {
-            const elementData = this.elements.find(el => el.element === element);
-            if (elementData) {
-                const instructionToRemove = instructions.find(inst => 
-                    inst.type === elementData.type && 
-                    JSON.stringify(inst.params) === JSON.stringify(elementData.originalParams));
-                    
-                if (instructionToRemove) {
-                    this.label.removeInstruction(instructionToRemove.id);
-                }
+        elementDataToDelete.forEach(elementData => {
+            const instructionToRemove = instructions.find(inst => 
+                inst.type === elementData.type && 
+                JSON.stringify(inst.params) === JSON.stringify(elementData.originalParams));
+                
+            if (instructionToRemove) {
+                this.label.removeInstruction(instructionToRemove.id);
             }
         });
         
