@@ -279,7 +279,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // 创建属性组
     function createPropertyGroup(title, properties) {
         let html = `<div class="property-group">
-            <h5>${title}</h5>`;
+            <h5>${title}</h5>
+            <div class="property-items">`;
             
         properties.forEach(prop => {
             html += `<label>${prop.label}</label>
@@ -289,7 +290,8 @@ document.addEventListener('DOMContentLoaded', () => {
                    ${prop.type === 'text' ? 'style="width: 100%"' : ''}>`;
         });
         
-        html += '</div>';
+        html += `</div>
+        </div>`;
         return html;
     }
     

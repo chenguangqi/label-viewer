@@ -353,14 +353,15 @@ header h1::after {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     z-index: 999;
     height: 100%;
-    overflow-y: auto;
     box-sizing: border-box;
     padding: 20px;
     margin-left: 15px;
     display: none; /* 默认隐藏，由JS控制显示 */
+    display: flex;
+    flex-direction: column;
 }
 
-.designer-properties-panel h3 {
+.designer-properties-panel > h3 {
     margin-top: 0;
     color: #2c3e50;
     font-weight: 600;
@@ -369,10 +370,41 @@ header h1::after {
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-shrink: 0;
+}
+
+.designer-properties-panel > #properties-content {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.designer-properties-panel .property-groups {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .designer-properties-panel .property-group {
     margin-bottom: 15px;
+    flex-shrink: 0;
+}
+
+.designer-properties-panel .property-group h5 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: #2c3e50;
+    font-weight: 600;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee;
+}
+
+.designer-properties-panel .property-group .property-items {
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 5px;
 }
 
 .designer-properties-panel .property-group label {
@@ -389,6 +421,7 @@ header h1::after {
     border-radius: 4px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     box-sizing: border-box;
+    margin-bottom: 10px;
 }
 
 .designer-properties-panel .property-group input:focus {
