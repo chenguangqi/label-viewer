@@ -141,6 +141,26 @@ class TextInstruction extends Instruction {
                 elementData.element.style.height = `${elementData.height}px`;
                 elementData.params[3] = value;
                 break;
+            case 'font-size':
+                elementData.element.style.fontSize = `${value}px`;
+                elementData.params[4] = value;
+                break;
+            case 'font-family':
+                elementData.element.style.fontFamily = value;
+                elementData.params[5] = value;
+                break;
+            case 'font-weight':
+                elementData.element.style.fontWeight = value;
+                elementData.params[6] = value;
+                break;
+            case 'text-align':
+                elementData.element.style.justifyContent = value === 'center' ? 'center' : (value === 'right' ? 'flex-end' : 'flex-start');
+                elementData.params[7] = value;
+                break;
+            case 'color':
+                elementData.element.style.color = value;
+                elementData.params[8] = value;
+                break;
             case 'text':
                 elementData.text = value;
                 elementData.element.textContent = value;

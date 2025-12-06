@@ -218,6 +218,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     { label: '宽度', name: 'width', value: instruction.params[2] || 100 },
                     { label: '高度', name: 'height', value: instruction.params[3] || 30 }
                 ]);
+
+                html += createPropertyGroup('字体', [
+                    { label: '字体大小', name: 'font-size', value: instruction.params[4] || 12, type: 'number', min: 1, max: 100 },
+                    { label: '字体族', name: 'font-family', value: instruction.params[5] || 'Arial', type: 'select', options: ['Arial', 'Helvetica', 'Times New Roman', 'Courier New', 'Verdana', 'Georgia'] },
+                    { label: '字体粗细', name: 'font-weight', value: instruction.params[6] || 'normal', type: 'select', options: ['normal', 'bold'] }
+                ]);
+                
+                html += createPropertyGroup('对齐方式', [
+                    { label: '文本对齐', name: 'text-align', value: instruction.params[7] || 'left', type: 'select', options: ['left', 'center', 'right'] }
+                ]);
+                
+                html += createPropertyGroup('颜色', [
+                    { label: '文本颜色', name: 'color', value: instruction.params[8] || '#000000', type: 'color' }
+                ]);
                 
                 html += createPropertyGroup('文本内容', [
                     { label: '内容', name: 'text', value: instruction.params[9] || '', type: 'text' }
@@ -303,15 +317,54 @@ document.addEventListener('DOMContentLoaded', () => {
             // 为位置参数添加额外属性
             const extraAttrs = isPositionParam ? 'min="0" step="1" oninput="this.value = Math.abs(parseInt(this.value) || 0)"' : '';
             
-            html += `<div class="property-item">
-                <label for="${prop.name}">${prop.label}</label>
-                <input type="${prop.type || 'number'}" 
-                       id="${prop.name}"
-                       data-property="${prop.name}" 
-                       value="${prop.value}" 
-                       ${extraAttrs}
-                       ${prop.type === 'text' ? 'style="width: 100%"' : ''}>
+            // 根据属性类型生成不同的输入控件
+            if (prop.type === 'select' && prop.options) {
+                // 下拉选择框
+                html += `<div class="property-item">
+                    <label for="${prop.name}">${prop.label}</label>
+                    <select id="${prop.name}" data-property="${prop.name}">`;
+                
+                prop.options.forEach(option => {
+                    const selected = option == prop.value ? 'selected' : '';
+                    html += `<option value="${option}" ${selected}>${option}</option>`;
+                });
+                
+                html += `</select>
                 </div>`;
+            } else if (prop.type === 'color') {
+                // 颜色选择器
+                html += `<div class="property-item">
+                    <label for="${prop.name}">${prop.label}</label>
+                    <input type="color" 
+                           id="${prop.name}"
+                           data-property="${prop.name}" 
+                           value="${prop.value}">
+                    </div>`;
+            } else if (prop.type === 'text') {
+                // 文本输入框
+                html += `<div class="property-item">
+                    <label for="${prop.name}">${prop.label}</label>
+                    <input type="text" 
+                           id="${prop.name}"
+                           data-property="${prop.name}" 
+                           value="${prop.value}"
+                           style="width: 100%">
+                    </div>`;
+            } else {
+                // 数字输入框（默认）
+                const minAttr = prop.min !== undefined ? `min="${prop.min}"` : '';
+                const maxAttr = prop.max !== undefined ? `max="${prop.max}"` : '';
+                html += `<div class="property-item">
+                    <label for="${prop.name}">${prop.label}</label>
+                    <input type="number" 
+                           id="${prop.name}"
+                           data-property="${prop.name}" 
+                           value="${prop.value}" 
+                           ${minAttr}
+                           ${maxAttr}
+                           ${extraAttrs}>
+                    </div>`;
+            }
         });
         
         html += `</div>
@@ -321,21 +374,23 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 绑定属性控件事件
     function bindPropertyControls(instruction) {
-        const inputs = propertiesContent.querySelectorAll('input');
+        const inputs = propertiesContent.querySelectorAll('input, select'); // 包括input和select元素
         inputs.forEach(input => {
             // 添加输入事件监听器，用于实时验证
-            input.addEventListener('input', () => {
-                const property = input.dataset.property;
-                // 检查是否为位置相关参数
-                const isPositionParam = ['x', 'y', 'width', 'height', 'size', 'x1', 'y1', 'x2', 'y2'].includes(property);
-                
-                if (isPositionParam) {
-                    // 确保值为非负整数
-                    let value = parseInt(input.value) || 0;
-                    value = Math.abs(value);
-                    input.value = value;
-                }
-            });
+            if (input.type === 'number') {
+                input.addEventListener('input', () => {
+                    const property = input.dataset.property;
+                    // 检查是否为位置相关参数
+                    const isPositionParam = ['x', 'y', 'width', 'height', 'size', 'x1', 'y1', 'x2', 'y2'].includes(property);
+                    
+                    if (isPositionParam) {
+                        // 确保值为非负整数
+                        let value = parseInt(input.value) || 0;
+                        value = Math.abs(value);
+                        input.value = value;
+                    }
+                });
+            }
             
             // 添加更改事件监听器，用于更新属性
             input.addEventListener('change', () => {
@@ -398,8 +453,125 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 更新文本区域中的指令
     function updateInstructionInTextarea(type, property, value) {
-        // 这里应该更新文本区域中的指令，暂时留空
-        // 实际实现需要解析和重构指令文本
+        // 获取指令输入框
+        const textarea = document.getElementById('instruction-input');
+        if (!textarea) return;
+        
+        // 获取当前指令文本
+        const lines = textarea.value.split('\n');
+        
+        // 找到正在编辑的指令行（基于当前选中元素）
+        if (labelDesigner && labelDesigner.selectedElement) {
+            const elementData = labelDesigner.elements.find(el => el.element === labelDesigner.selectedElement);
+            if (!elementData) return;
+            
+            // 查找匹配的指令行
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line || line.startsWith('#')) continue; // 跳过空行和注释
+                
+                const parts = line.split(',');
+                if (parts.length < 2) continue;
+                
+                const instructionType = parts[0];
+                if (instructionType !== type) continue;
+                
+                // 检查参数是否匹配（简单匹配前几个参数）
+                let isMatch = true;
+                for (let j = 1; j <= Math.min(parts.length - 1, 5); j++) { // 只比较前5个参数
+                    if (parts[j] !== String(elementData.params[j-1])) {
+                        isMatch = false;
+                        break;
+                    }
+                }
+                
+                if (isMatch) {
+                    // 更新参数
+                    switch (type) {
+                        case 'text':
+                            switch (property) {
+                                case 'x':
+                                    parts[1] = value;
+                                    break;
+                                case 'y':
+                                    parts[2] = value;
+                                    break;
+                                case 'width':
+                                    parts[3] = value;
+                                    break;
+                                case 'height':
+                                    parts[4] = value;
+                                    break;
+                                case 'font-size':
+                                    parts[5] = value;
+                                    break;
+                                case 'font-family':
+                                    parts[6] = value;
+                                    break;
+                                case 'font-weight':
+                                    parts[7] = value;
+                                    break;
+                                case 'text-align':
+                                    parts[8] = value;
+                                    break;
+                                case 'color':
+                                    parts[9] = value;
+                                    break;
+                                case 'text':
+                                    parts[10] = value;
+                                    break;
+                            }
+                            break;
+                            
+                        case 'barcode':
+                            if (property === 'content') {
+                                parts[7] = value;
+                            } else {
+                                // 处理其他参数
+                                switch (property) {
+                                    case 'x':
+                                        parts[2] = value;
+                                        break;
+                                    case 'y':
+                                        parts[3] = value;
+                                        break;
+                                    case 'width':
+                                        parts[4] = value;
+                                        break;
+                                    case 'height':
+                                        parts[5] = value;
+                                        break;
+                                }
+                            }
+                            break;
+                            
+                        case 'qrcode':
+                            if (property === 'content') {
+                                parts[5] = value;
+                            } else {
+                                // 处理其他参数
+                                switch (property) {
+                                    case 'x':
+                                        parts[1] = value;
+                                        break;
+                                    case 'y':
+                                        parts[2] = value;
+                                        break;
+                                    case 'size':
+                                        parts[3] = value;
+                                        break;
+                                }
+                            }
+                            break;
+                    }
+                    
+                    // 更新行内容
+                    lines[i] = parts.join(',');
+                    textarea.value = lines.join('\n');
+                    break;
+                }
+            }
+        }
     }
     
     // 初始渲染
