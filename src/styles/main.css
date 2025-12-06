@@ -6,6 +6,7 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #f5f7fa 0%, #e4edf9 100%);
     min-height: 100vh;
+    position: relative; /* 添加相对定位 */
 }
 
 /* 标题样式 */
@@ -490,10 +491,10 @@ header h1::after {
 
 /* 悬浮保存按钮样式 */
 .floating-save-btn {
-    position: fixed;
+    position: absolute;
     top: 20px;
     right: 20px;
-    z-index: 10000;
+    z-index: 1000;
     border-radius: 50px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     padding: 12px 20px;
@@ -679,4 +680,23 @@ header h1::after {
 /* 图标样式 */
 .button-group button i {
     font-size: 18px;
+}
+
+/* 容器样式 */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4edf9 100%);
+    min-height: 100vh;
+    position: relative; /* 添加相对定位 */
+}
+
+/* 悬浮下载按钮样式 */
+#save-label-btn {
+    position: absolute;
+    top: 10px; /* 距离顶部10px */
+    right: 10px; /* 距离右侧10px */
+    z-index: 1000; /* 确保按钮在其他元素之上 */
 }
