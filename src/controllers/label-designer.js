@@ -744,6 +744,48 @@ class LabelDesigner {
     set selectedElement(element) {
         this._selectedElement = element;
     }
+    
+    /**
+     * 删除选中的元素
+     */
+    deleteSelectedElement() {
+        if (!this.selectedElement) return;
+        
+        // 从elements数组中找到要删除的元素
+        const elementIndex = this.elements.findIndex(el => el.element === this.selectedElement);
+        if (elementIndex === -1) return;
+        
+        const elementData = this.elements[elementIndex];
+        
+        // 从canvas中移除元素
+        this.canvas.removeChild(this.selectedElement);
+        
+        // 从elements数组中移除
+        this.elements.splice(elementIndex, 1);
+        
+        // 从label实例中移除对应的指令
+        const instructions = this.label.getAllInstructionsWithId();
+        const instructionToRemove = instructions.find(inst => 
+            inst.type === elementData.type && 
+            JSON.stringify(inst.params) === JSON.stringify(elementData.originalParams));
+            
+        if (instructionToRemove) {
+            this.label.removeInstruction(instructionToRemove.id);
+        }
+        
+        // 取消选中状态
+        this.selectedElement = null;
+        
+        // 触发属性面板更新
+        if (this.onInstructionChange) {
+            this.onInstructionChange(null);
+        }
+        
+        // 触发更新回调
+        if (this.onUpdate) {
+            this.onUpdate();
+        }
+    }
 }
 
 // 确保在浏览器环境中将LabelDesigner附加到window对象

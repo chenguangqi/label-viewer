@@ -70,6 +70,27 @@ document.addEventListener('DOMContentLoaded', () => {
     // 防止循环同步的标志位
     let isSyncing = false;
     
+    // 绑定键盘事件，实现在设计器中按Delete键删除元素
+    document.addEventListener('keydown', (event) => {
+        // 检查当前是否在设计器标签页
+        const activeTab = document.querySelector('.tab-button.active');
+        if (activeTab && activeTab.getAttribute('data-tab') === 'designer-tab') {
+            // 检查是否按下了Delete键或X键
+            if (event.key === 'Delete' || event.key === 'x' || event.key === 'X') {
+                // 阻止默认行为
+                event.preventDefault();
+                
+                // 删除选中的元素
+                if (labelDesigner && labelDesigner.selectedElement) {
+                    labelDesigner.deleteSelectedElement();
+                    
+                    // 同步到编辑器
+                    syncDesignerToEditor();
+                }
+            }
+        }
+    });
+
     // 绑定标签页切换事件
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabPanes = document.querySelectorAll('.tab-pane');
