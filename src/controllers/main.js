@@ -231,6 +231,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     { label: '宽度', name: 'width', value: instruction.params[3] || 100 },
                     { label: '高度', name: 'height', value: instruction.params[4] || 30 }
                 ]);
+                
+                html += createPropertyGroup('条码内容', [
+                    { label: '条码值', name: 'value', value: instruction.params[6] || '', type: 'text' }
+                ]);
                 break;
                 
             case 'qrcode':
@@ -238,6 +242,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     { label: 'X坐标', name: 'x', value: instruction.params[0] || 0 },
                     { label: 'Y坐标', name: 'y', value: instruction.params[1] || 0 },
                     { label: '尺寸', name: 'size', value: instruction.params[2] || 50 }
+                ]);
+                
+                html += createPropertyGroup('二维码内容', [
+                    { label: '二维码值', name: 'value', value: instruction.params[4] || '', type: 'text' }
                 ]);
                 break;
                 
@@ -346,11 +354,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // 更新标签设计器中的元素
                 if (labelDesigner && labelDesigner.selectedElement) {
-                    labelDesigner.updateElementProperty(
-                        labelDesigner.selectedElement, 
-                        property, 
-                        value
-                    );
+                    // 特殊处理条形码和二维码的值参数
+                    if ((instruction.type === 'barcode' || instruction.type === 'qrcode') && property === 'value') {
+                        // 对于条形码，更新params[6]
+                        if (instruction.type === 'barcode') {
+                            instruction.params[6] = value;
+                        }
+                        // 对于二维码，更新params[4]
+                        else if (instruction.type === 'qrcode') {
+                            instruction.params[4] = value;
+                        }
+                        
+                        // 更新设计器中的元素显示
+                        const elementData = labelDesigner.elements.find(el => el.element === labelDesigner.selectedElement);
+                        if (elementData) {
+                            // 更新元素显示文本（如果需要）
+                            if (instruction.type === 'barcode') {
+                                // 条形码不直接显示文本内容，但可以更新其数据
+                            } else if (instruction.type === 'qrcode') {
+                                // 二维码也不直接显示文本内容
+                            }
+                        }
+                    } else {
+                        // 处理其他属性
+                        labelDesigner.updateElementProperty(
+                            labelDesigner.selectedElement, 
+                            property, 
+                            value
+                        );
+                    }
                 }
                 
                 // 更新指令输入框中的文本
