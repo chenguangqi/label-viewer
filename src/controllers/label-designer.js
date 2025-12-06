@@ -156,8 +156,8 @@ class LabelDesigner {
         x = Math.max(0, Math.min(x, containerRect.width - this.selectedElement.offsetWidth));
         y = Math.max(0, Math.min(y, containerRect.height - this.selectedElement.offsetHeight));
         
-        // 网格吸附 - 将元素位置对齐到20x20像素的网格
-        const gridSize = 20;
+        // 网格吸附 - 将元素位置对齐到10x10像素的网格（从原来的20x20调整）
+        const gridSize = 10; // 从20调整为10
         x = Math.round(x / gridSize) * gridSize;
         y = Math.round(y / gridSize) * gridSize;
         
