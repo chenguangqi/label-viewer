@@ -130,6 +130,11 @@ class LabelDesigner {
             this.selectedElement.style.outline = '';
             this.selectedElement = null;
         }
+        
+        // 触发属性面板更新，传入null表示没有选中元素
+        if (this.onInstructionChange) {
+            this.onInstructionChange(null);
+        }
     }
     
     startDrag(e) {

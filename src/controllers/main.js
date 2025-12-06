@@ -187,14 +187,17 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 当元素被选中时更新属性面板
     function onElementSelected(instruction) {
+        if (!instruction) {
+            // 清空属性面板内容，但不隐藏面板本身
+            if (propertiesContent) {
+                propertiesContent.innerHTML = '';
+            }
+            return;
+        }
+        
         // 显示属性面板
         if (propertiesPanel) {
             propertiesPanel.style.display = 'block';
-        }
-        
-        if (!instruction) {
-            propertiesContent.innerHTML = '<p>请选择一个元素以编辑其属性</p>';
-            return;
         }
         
         const helpInfo = helpData.getInstructionHelp(instruction.type);
